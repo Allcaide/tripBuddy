@@ -12,13 +12,14 @@ const DB = process.env.DATABASE.replace(
 
 mongoose
   .connect(DB, {
-    useNewUrlParser: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    useUnifiedTopology: true, // <-- Adiciona isto!
+    // opcional: dbName se não estiver explícito na connection string
+    dbName: 'tripbuddy',
   })
-  .then(() => console.log('conection successfull!'));
-
+  .then(() => console.log('DB connection successful'))
+  .catch((err) => {
+    console.error('DB connection error:', err.message);
+    process.exit(1);
+  });
 // console.log(process.env); //checking the environment, if it is development or production
 
 const port = process.env.PORT || 3000;

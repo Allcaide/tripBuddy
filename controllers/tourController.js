@@ -10,17 +10,14 @@ const Tour = require('./../Models/tourModels'); // Importing the Tour model
 //     //     status: '404',
 //     //     message: 'Invalid Id',
 //     //   }
-    
-    
+
 //   console.log(`Tour id is: ${val}`);
 //   //console.log('req params id ', req.params.id, 'tours len ', tours.length);
 //   next();
 // };
 
-
-
 //Route Handlers
-exports.getAllTours = (req, res) => {
+exports.getAllTours = async (req, res) => {
   //(req,res) => é o que vem do cliente, e o que é enviado de volta para o cliente, tipicamente chamamos de route handler
   // res.status(200).json({
   //   status: 'success',
@@ -30,72 +27,76 @@ exports.getAllTours = (req, res) => {
   //     tours: tours,
   //   },
   // });
-}
 
-// app.get('/api/v1/tours/:id', (req, res) => {
-//   console.log(req.params)
-//   //(req,res) => é o que vem do cliente, e o que é enviado de volta para o cliente, tipicamente chamamos de route handler
-//   res.status(200).json({
-//     status: 'success',
-//   //   results: tours.length,
-//   //   data: {
-//   //     tours: tours,
-//   //   },
-//   });
-// });
+  // app.get('/api/v1/tours/:id', (req, res) => {
+  //   console.log(req.params)
+  //   //(req,res) => é o que vem do cliente, e o que é enviado de volta para o cliente, tipicamente chamamos de route handler
+  //   res.status(200).json({
+  //     status: 'success',
+  //   //   results: tours.length,
+  //   //   data: {
+  //   //     tours: tours,
+  //   //   },
+  //   });
+  // });
+  try {
+    const Tours = await Tour.find();
+    res.status(200).json({
+      status: 'success',
+      results: Tours.length,
+      data: {
+        tours: Tours,
+      },
+    });
+  } catch (err) {
+    console.error('Error fetching tours:', err);
+    res.status(500).json({
+      status: 'fail',
+      message: 'Error fetching tours',
+    });
+  }
+};
 
 exports.addNewTour = async (req, res) => {
-  // const newTour = new tour({});
-  // newTour.save(); //Como se fazia antes de saber como se faz bem
+  try {
+    // const newTour = new tour({});
+    // newTour.save(); //Como se fazia antes de saber como se faz bem
 
-  const newTour = await Tour.create(req.body);
-      res.status(201).json({
-        status: 'success',
-        data: {
-          tour: newTour,
-        },
-      });
-}
+    const newTour = await Tour.create(req.body);
+    res.status(201).json({
+      status: 'success',
+      data: {
+        tour: newTour,
+      },
+    });
+  } catch (err) {
+    console.error('Error creating new tour:', err);
+    res.status(400).json({
+      status: 'fail',
+      message: 'Invalid data sent',
+    });
+  }
+};
 
-exports.getTour = (req, res) => {
-  console.log(req.params);
-  const id = req.params.id * 1; //Converting to number
-  console.log(id);
-  //// ...PARA A FUNÇÃO ABAIXO
-
-  // A função find recebe uma callback function como argumento.
-  // Uma callback function é uma função passada como parâmetro para outra função, que será chamada (executada) dentro da função principal.
-  // Neste caso, para cada elemento do array tours, a função find executa a callback function: el => el.id === req.params
-  // - 'el' representa o elemento atual do array tours em cada iteração.
-  // - 'el.id' é o id do elemento atual.
-  // - 'req.params' deveria ser 'req.params.id' para comparar corretamente o id do tour com o parâmetro da requisição.
-  // A função find retorna o primeiro elemento para o qual a callback retorna true.
-  // Exemplo passo a passo:
-  //   1ª iteração: el = tours[0], verifica se tours[0].id === req.params
-  //   2ª iteração: el = tours[1], verifica se tours[1].id === req.params
-  //   ...até encontrar um elemento que satisfaça a condição.
-  // O resultado é atribuído à variável 'tours', mas isso pode causar confusão, pois tours era um array e agora será um único objeto ou undefined.
-  // Recomenda-se usar outro nome, como 'tour'.
-
-  // Correção sugerida:
-  // const tour = tours.find(el => el.id === req.params.id);
-
-  // ...existing
-  const tour = tours.find((el) => el.id === id);
-  console.log(tour);
-
-  //(req,res) => é o que vem do cliente, e o que é enviado de volta para o cliente, tipicamente chamamos de route handler
-  res.status(200).json({
-    status: 'success',
-    // results: tours.length,
-    data: {
-      tours: tour,
-    },
-  });
+exports.getTour = async (req, res) => {
+  try {
+    const tour = await Tour.findById(req.params.id);
+    if (!tour) {
+      return res
+        .status(404)
+        .json({ status: 'fail', message: 'Tour not found' });
+    }
+    res.status(200).json({
+      status: 'success',
+      data: { tour },
+    });
+  } catch (err) {
+    console.error('Error fetching tour:', err);
+    res.status(500).json({ status: 'fail', message: 'Error fetching tour' });
+  }
 };
 
 exports.updateTour = (req, res) => {
-
   const id = req.params.id * 1; //Converting to number
   //recolher o input vindo do client
   console.log(req.body);
