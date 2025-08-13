@@ -40,12 +40,34 @@ exports.getAllTours = async (req, res) => {
   //   });
   // });
   try {
-    const Tours = await Tour.find();
+    //1st BUILD QUERY
+    //FILTERING
+    const queryObj = { ...req.query }; // Creating a hardcopy by {} and distructuring 
+    // //Create a shallow copy of the query parameters
+    //console.log(req.query); // Log the query parameters for debugging
+    const excludedFields = ['page', 'sort', 'limit', 'fields']; // Fields to exclude from the query
+    excludedFields.forEach((el) => delete queryObj[el]); // Remove excluded fields
+    
+    //ADVANCE FILTERING
+    let queryStr = JSON.stringify(queryObj);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    console.log(JSON.parse(queryStr));
+
+
+    const query = Tour.find(JSON.parse(queryStr));
+
+
+    //2ND EXECUTE QUERY
+    const tours = await query;
+
+
+
+    //3RD SEND REPONSE
     res.status(200).json({
       status: 'success',
-      results: Tours.length,
+      results: tours.length,
       data: {
-        tours: Tours,
+        tours: tours,
       },
     });
   } catch (err) {

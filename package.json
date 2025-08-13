@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node server.js",
+    "start": "node --no-deprecation server.js",
     "start:prod": "cross-env NODE_ENV=production node server.js"
   },
   "author": "Luis Alcaide",
@@ -15,7 +15,7 @@
     "cors": "^2.8.5",
     "dotenv": "^16.4.5",
     "express": "^4.19.2",
-    "mongoose": "^7.6.3",
+    "mongoose": "^5.13.22",
     "morgan": "^1.10.1"
   },
   "devDependencies": {

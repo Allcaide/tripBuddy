@@ -12,7 +12,10 @@ const DB = process.env.DATABASE.replace(
 
 mongoose
   .connect(DB, {
-    // opcional: dbName se não estiver explícito na connection string
+    useNewUrlParser: true,
+    useUnifiedTopology: true,
+    useCreateIndex: true,
+    useFindAndModify: false,
     dbName: 'tripbuddy',
   })
   .then(() => console.log('DB connection successful'))
