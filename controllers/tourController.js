@@ -42,25 +42,52 @@ exports.getAllTours = async (req, res) => {
   try {
     //1st BUILD QUERY
     //FILTERING
-    const queryObj = { ...req.query }; // Creating a hardcopy by {} and distructuring 
+    const queryObj = { ...req.query }; // Creating a hardcopy by {} and distructuring
     // //Create a shallow copy of the query parameters
     //console.log(req.query); // Log the query parameters for debugging
     const excludedFields = ['page', 'sort', 'limit', 'fields']; // Fields to exclude from the query
     excludedFields.forEach((el) => delete queryObj[el]); // Remove excluded fields
-    
-    //ADVANCE FILTERING
+
+    //1B ADVANCE FILTERING
     let queryStr = JSON.stringify(queryObj);
-    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, match => `$${match}`);
+    queryStr = queryStr.replace(/\b(gte|gt|lte|lt)\b/g, (match) => `$${match}`);
     console.log(JSON.parse(queryStr));
 
+    let query = Tour.find(JSON.parse(queryStr));
 
-    const query = Tour.find(JSON.parse(queryStr));
+
+    //2nd SORTING
+    if (req.query.sort) {
+      const sortBy = req.query.sort.split(',').join(' ');
+      console.log(sortBy);
+      query = query.sort(sortBy);
+      //ratingsAverage
+    } else {
+      query = query.sort('-createdAt'); // Default sorting by createdAt in descending order
+    }
+
+    //3rd Field Limiting
+    if (req.query.fields){
+      const fields = req.query.fields.split(',').join(' ');
+      query = query.select(fields); // Select specific fields
+    } else { 
+      query = query.select('-__v'); // Exclude the __v field by default with de '-' we will exlude it
+    }
+
+    //4 PAGINATION
+    const page = req.query.page * 1 || 1;
+    const limit = req.query.limit*1 || 100;
+    const skip = (page - 1) * limit;
+    query = query.skip(skip).limit(limit);
+
+    if (req.query.page) {
+      const numTours = await Tour.countDocuments();
+      if(skip>numTours) throw new Error('This page does not exist');
+    }
 
 
     //2ND EXECUTE QUERY
     const tours = await query;
-
-
 
     //3RD SEND REPONSE
     res.status(200).json({
@@ -154,4 +181,3 @@ exports.deleteTour = async (req, res) => {
     });
   }
 };
- 

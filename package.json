@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "node --no-deprecation server.js",
+    "start": "nodemon --no-deprecation server.js",
     "start:prod": "cross-env NODE_ENV=production node server.js"
   },
   "author": "Luis Alcaide",
