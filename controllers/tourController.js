@@ -112,7 +112,7 @@ exports.deleteTour = async (req, res) => {
 };
 
 exports.getTourStats = async (req, res) => {
-  try{
+  try {
     const stats = await Tour.aggregate([
       {
         $match: { ratingsAverage: { $gte: 4.5 } }, // Match tours with high ratings
@@ -145,4 +145,64 @@ exports.getTourStats = async (req, res) => {
       message: 'Error fetching tour stats',
     });
   }
-}
+};
+
+exports.getMonthStats = async (req, res) => {
+  try {
+    const year = req.params.year * 1; // Convert year to number
+    //console.log(year); Até aqui está certo
+    const plan = await Tour.aggregate([
+      //https://www.mongodb.com/pt-br/docs/manual/aggregation/
+      //https://www.mongodb.com/pt-br/docs/manual/reference/mql/aggregation-stages/#std-label-aggregation-pipeline-operator-reference
+      {
+        $unwind: '$startDates', // Unwind the startDates array
+      },
+      {
+        $match: {
+          startDates: {
+            $gte: new Date(`${year}-01-01`),
+            $lte: new Date(`${year}-12-31`), //yyyy-MM-DD
+          },
+        },
+      },
+      {
+        $group: {
+          _id: {
+            $month: '$startDates',
+          },
+          numTourStarts: { $sum: 1 },
+          tours: { $push: '$name' },
+        },
+      },
+      {
+        $addFields: { month: '$_id' },
+      },
+      {
+        $project: {
+          _id: 0,
+        },
+      },
+      {
+        $sort: { numTourStarts: -1 },
+      },
+      {
+        $limit: 12,
+      },
+    ]);
+
+    res.status(200).json({
+      status: 'success',
+      status_lenght: plan.length,
+      data: {
+        plan,
+      },
+    });
+  
+  } catch (err) {
+    console.error('Error fetching tour stats:', err);
+    res.status(500).json({
+      status: 'fail',
+      message: 'Error fetching tour stats',
+    });
+  }
+};
