@@ -29,6 +29,7 @@ app.use('/api/v1/users', userRouter);
 app.all('*', (req, res, next) => {
 
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404)); //passar o erro para o middleware de tratamento de erros
+  
 }); // <-- fecha o callback e a chamada app.all
 
 app.use(globalErrorHandler); //middleware de tratamento de erros, que vai ser chamado sempre que o next for chamado com um argumento
