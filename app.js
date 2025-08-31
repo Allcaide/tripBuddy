@@ -1,7 +1,6 @@
 const express = require('express'); //importando o express, que é um framework para node.js
 const morgan = require('morgan'); //middleware para logar as requisições no console
 
-
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
@@ -27,9 +26,7 @@ app.use('/api/v1/tours', tourRouter); //mounting the router, so all the routes t
 app.use('/api/v1/users', userRouter);
 
 app.all('*', (req, res, next) => {
-
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404)); //passar o erro para o middleware de tratamento de erros
-  
 }); // <-- fecha o callback e a chamada app.all
 
 app.use(globalErrorHandler); //middleware de tratamento de erros, que vai ser chamado sempre que o next for chamado com um argumento
