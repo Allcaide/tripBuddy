@@ -12,7 +12,7 @@ exports.aliasTopTours = (req, res, next) => {
 
 //Route Handlers
 exports.getAllTours = catchAsync(async (req, res, next) => {
-  console.log('GET /tours query:', req.query);
+  //console.log('GET /tours query:', req.query);
   const features = new APIFeatures(Tour.find(), req.query)
     .filter()
     .sort()

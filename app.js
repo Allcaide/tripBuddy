@@ -18,6 +18,7 @@ app.use(express.static(`${__dirname}/public`)); //middleware para servir arquivo
 
 app.use((req, res, next) => {
   req.resquestTime = new Date().toISOString();
+  //console.log(req.headers);
   next();
 });
 
