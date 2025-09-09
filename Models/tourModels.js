@@ -1,6 +1,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
+// const User = require('./userModel');
 
 const tourSchema = new mongoose.Schema(
   {
@@ -29,25 +30,25 @@ const tourSchema = new mongoose.Schema(
     difficulty: {
       type: String,
       required: [true, 'A tour must have a difficulty level'], //making the difficulty field required
-        enum: {
-          values: ['easy', 'medium', 'difficult'], //defining the possible values for difficulty
-          message: 'Difficulty is either: easy, medium, or difficult',
-        },
+      enum: {
+        values: ['easy', 'medium', 'difficult'], //defining the possible values for difficulty
+        message: 'Difficulty is either: easy, medium, or difficult',
       },
-      ratingsAverage: {
-        type: Number,
-        default: 4.5, //setting a default value for the rating field
-        min: [1, 'Rating must be above 1.0'],
-        max: [5, 'Rating must be below 5.0'],
-      },
-      ratingsQuantity: {
-        type: Number,
-        default: 0, //setting a default value for the ratingsQuantity field
-      },
-      price: {
-        type: Number,
-        required: [true, 'A tour must have a price'], //making the price field required
-      },
+    },
+    ratingsAverage: {
+      type: Number,
+      default: 4.5, //setting a default value for the rating field
+      min: [1, 'Rating must be above 1.0'],
+      max: [5, 'Rating must be below 5.0'],
+    },
+    ratingsQuantity: {
+      type: Number,
+      default: 0, //setting a default value for the ratingsQuantity field
+    },
+    price: {
+      type: Number,
+      required: [true, 'A tour must have a price'], //making the price field required
+    },
     priceDiscount: {
       type: Number,
       validate: {
@@ -81,6 +82,36 @@ const tourSchema = new mongoose.Schema(
       select: false,
     },
     startDates: [Date], //array of dates for tour start dates
+    startLocation: {
+      //GeoJSON
+      type: {
+        type: String,
+        default: 'Point',
+        enum: ['Point'],
+      },
+      coordinates: [Number],
+      address: String,
+      description: String,
+    },
+    locations: [
+      {
+        type: {
+          type: String,
+          default: 'Point',
+          enum: ['Point'],
+        },
+        coodinates: [Number],
+        address: String,
+        decription: String,
+        day: Number,
+      },
+    ],
+    guides: [
+      {
+        type: mongoose.Schema.ObjectId,
+        ref: 'User',
+      },
+    ],
   },
   {
     toJSON: { virtuals: true },
@@ -92,11 +123,17 @@ tourSchema.virtual('durationWeeks').get(function () {
   return this.duration / 7; //creating a virtual property to calculate duration in weeks
 });
 
-//DOCUMENT MIDDLEWARE runs before .save() and .create()
+// DOCUMENT MIDDLEWARE runs before .save() and .create()
 tourSchema.pre('save', function (next) {
   this.slug = slugify(this.name, { lower: true }); //creating a slug from the name field
   next(); //calling the next middleware in the stack //If it doesnt call the next middleware function it will hang
 });
+
+// tourSchema.pre('save', async function (next) {
+//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
+//   this.guides = await Promise.all(guidesPromises);
+//   next();
+// });
 
 // tourSchema.pre('save', function (next) {
 //   console.log('Will save document...'); //logging a message before saving the document
@@ -115,6 +152,14 @@ tourSchema.pre(/^find/, function (next) {
 
   this.find({ secretTour: { $ne: true } });
   this.start = Date.now();
+  next();
+});
+
+tourSchema.pre(/^find/, function (next) {
+  this.select('-__v').populate({
+    path: 'guides',
+    select: '-__v -passwordChangedAt',
+  });
   next();
 });
 

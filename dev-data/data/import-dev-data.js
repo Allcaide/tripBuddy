@@ -2,7 +2,8 @@ const mongoose = require('mongoose');
 const dotenv = require('dotenv'); //importing dotenv to use environment variables
 const fs = require('fs');
 const Tour = require('./../../Models/tourModels');
-dotenv.config({ path: './config.env' }); //configuring dotenv to use the config.env file
+// Ensure we load the project's root config.env regardless of cwd
+dotenv.config({ path: `${__dirname}/../../config.env` }); //configuring dotenv to use the config.env file
 
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
@@ -21,10 +22,8 @@ mongoose
   });
 // console.log(process.env); //checking the environment, if it is development or production
 
-const tours = JSON.parse(
-  fs.readFileSync(`${__dirname}/tours-simple.json`, 'utf-8')
-);
-
+const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
+//console.log('Tours lidos:', tours);
 //IMPORT DATA INTO DATABASE
 const importData = async () => {
   try {
@@ -47,10 +46,25 @@ const deleteData = async () => {
 };
 
 if (process.argv[2] === '--import') {
-  importData();
-  process.exit();
+  importData()
+    .then(() => {
+      console.log('Import finished, exiting.');
+      process.exit();
+    })
+    .catch((err) => {
+      console.error('Import failed:', err);
+      process.exit(1);
+    });
 } else if (process.argv[2] === '--delete') {
-  deleteData();
+  deleteData()
+    .then(() => {
+      console.log('Delete finished, exiting.');
+      process.exit();
+    })
+    .catch((err) => {
+      console.error('Delete failed:', err);
+      process.exit(1);
+    });
 }
 
 console.log(process.argv);
