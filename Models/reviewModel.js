@@ -38,7 +38,11 @@ const reviewSchema = new mongoose.Schema(
 );
 
 reviewSchema.pre(/^find/, function (next) {
-  this.populate({ path: 'tour', select: 'name' }).populate({
+  // this.populate({ path: 'tour', select: 'name' }).populate({
+  //   path: 'user',
+  //   select: 'name photo',
+  // });
+  this.populate({
     path: 'user',
     select: 'name photo',
   });
@@ -49,12 +53,6 @@ const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
 
-//Mission:
-/*
-Implement both endpoints
-Controller file
-Controller functions
-Routes in reviewroutes files
-
-create new reviews and retrieve them from the data base
-*/
+//POST TOUR/SLADKFB2134/ REVIEWS
+//GET TOUR/SLADKFB2134/ REVIEWS
+//GET TOUR/SLADKFB2134/ REVIEWS/SADBSADG546
