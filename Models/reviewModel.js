@@ -37,6 +37,8 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
+reviewSchema.index({ tour: 1, user: 1 }, { unique: true });//User cannot write multiple reviews on the same tour. but it's now roking i dont know why
+
 reviewSchema.pre(/^find/, function (next) {
   // this.populate({ path: 'tour', select: 'name' }).populate({
   //   path: 'user',
@@ -49,10 +51,49 @@ reviewSchema.pre(/^find/, function (next) {
   next();
 });
 
+reviewSchema.statics.calcAverageRatings = async function (tourId) {
+  const stats = await this.aggregate([
+    {
+      $match: { tour: tourId },
+    },
+    {
+      $group: {
+        _id: '$tour',
+        nRating: { $sum: 1 },
+        avgRating: { $avg: '$rating' },
+      },
+    },
+  ]);
+  // console.log(stats);
+
+  if (stats.length > 0) {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: stats[0].nRating,
+      ratingsAverage: stats[0].avgRating,
+    });
+  } else {
+    await Tour.findByIdAndUpdate(tourId, {
+      ratingsQuantity: 0,
+      ratingsAverage: 0,
+    });
+  }
+};
+
+reviewSchema.post('save', function () {
+  //this points to current review. post bcz only after tyhe doc is saved we can update the function
+
+  this.constructor.calcAverageRatings(this.tour); //this.constructor points to the current model
+});
+
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  this.r = await this.findOne();
+  // console.log(this.r);
+  next();
+});
+reviewSchema.post(/^findOneAnd/, async function () {
+  await this.r.constructor.calcAverageRatings(this.r.tour);
+});
+
 const Review = mongoose.model('Review', reviewSchema);
 
 module.exports = Review;
-
-//POST TOUR/SLADKFB2134/ REVIEWS
-//GET TOUR/SLADKFB2134/ REVIEWS
-//GET TOUR/SLADKFB2134/ REVIEWS/SADBSADG546
