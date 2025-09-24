@@ -6,7 +6,20 @@ export default {
   theme: {
     extend: {},
   },
-  plugins: [daisyui],
+  plugins: [
+    daisyui,
+    function ({ addUtilities }) {
+      addUtilities({
+        ".hide-scrollbar": {
+          "-ms-overflow-style": "none",
+          "scrollbar-width": "none",
+        },
+        ".hide-scrollbar::-webkit-scrollbar": {
+          display: "none",
+        },
+      });
+    },
+  ],
   daisyui: {
     themes: ["nord", "dark"],
   },

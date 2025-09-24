@@ -1,0 +1,39 @@
+{
+  "slides": [
+    {
+      "id": 1,
+      "image": "/images/carousel/hero-1.jpg",
+      "title": "DISCOVER THE COLORFUL WORLD",
+      "subtitle": "NEW ADVENTURE",
+      "description": "Explore breathtaking destinations and create unforgettable memories with our curated travel experiences."
+    },
+    {
+      "id": 2,
+      "image": "/images/carousel/hero-2.jpg",
+      "title": "EXPLORE NATURE",
+      "subtitle": "WILD ADVENTURES",
+      "description": "Journey through pristine forests and discover the beauty of untouched wilderness."
+    },
+    {
+      "id": 3,
+      "image": "/images/carousel/hero-3.jpg",
+      "title": "MOUNTAIN PEAKS",
+      "subtitle": "REACH NEW HEIGHTS",
+      "description": "Challenge yourself with mountain adventures and witness spectacular panoramic views."
+    },
+    {
+      "id": 4,
+      "image": "/images/carousel/hero-4.jpg",
+      "title": "OCEAN WONDERS",
+      "subtitle": "DIVE INTO PARADISE",
+      "description": "Discover crystal clear waters and vibrant marine life in the world's most beautiful destinations."
+    },
+    {
+      "id": 5,
+      "image": "/images/carousel/hero-5.jpg",
+      "title": "OCEAN WONDERS",
+      "subtitle": "DIVE INTO PARADISE",
+      "description": "Discover crystal clear waters and vibrant marine life in the world's most beautiful destinations."
+    }
+  ]
+}

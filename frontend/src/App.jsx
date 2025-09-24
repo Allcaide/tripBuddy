@@ -7,7 +7,7 @@ import { Toaster, toast } from "react-hot-toast";
 
 const App = () => {
   return (
-    <div data-theme="nord">
+    <div>
       <Routes>
         <Route path="/" element={<HomePage />}></Route>
         <Route path="/CreateTourPage" element={<CreateTourPage />}></Route>
