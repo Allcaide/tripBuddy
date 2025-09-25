@@ -10,7 +10,27 @@ const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/usersRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const viewRouter = require('./routes/viewRoutes');
 const app = express();
+const cors = require('cors');
+
+// CORS Configuration
+const corsOptions = {
+  origin: [
+    'http://localhost:5173', // Vite dev server
+    'http://localhost:3000', // React dev server alternativo
+    'http://127.0.0.1:5173',
+  ],
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
+  allowedHeaders: [
+    'Content-Type',
+    'Authorization',
+    'X-Requested-With',
+    'Accept',
+    'Origin',
+  ],
+};
 
 // Global Middlewares
 //set Security http headers
@@ -53,6 +73,12 @@ app.use(
   })
 );
 
+// Apply CORS middleware
+app.use(cors(corsOptions));
+
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
 //Serving static files
 app.use(express.static(`${__dirname}/public`)); //middleware para servir arquivos estáticos, como imagens, css, js, etc. O __dirname é o diretório atual do arquivo app.js, e public é a pasta onde os arquivos estáticos estão
 
@@ -64,6 +90,7 @@ app.use((req, res, next) => {
 });
 
 //3) Routes
+app.use('/', viewRouter);
 app.use('/api/v1/tours', tourRouter); //mounting the router, so all the routes that are defined in the tourRouter will be prefixed with /api/v1/tours
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
