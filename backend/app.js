@@ -1,47 +1,68 @@
-const express = require('express'); //importando o express, que é um framework para node.js
-const morgan = require('morgan'); //middleware para logar as requisições no console
+const express = require('express');
+const morgan = require('morgan');
 const rateLimit = require('express-rate-limit');
 const helmet = require('helmet');
 const mongoSanitize = require('express-mongo-sanitize');
 const xss = require('xss-clean');
 const hpp = require('hpp');
+const cors = require('cors');
+const path = require('path');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const tourRouter = require('./routes/tourRoutes');
 const userRouter = require('./routes/usersRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
-const viewRouter = require('./routes/viewRoutes');
-const app = express();
-const cors = require('cors');
 
-// CORS Configuration
+const app = express();
+
+// 🎯 CORS Configuration - MUITO IMPORTANTE!
 const corsOptions = {
   origin: [
     'http://localhost:5173', // Vite dev server
-    'http://localhost:3000', // React dev server alternativo
+    'http://localhost:3000', // React dev server
     'http://127.0.0.1:5173',
+    'http://127.0.0.1:3000',
   ],
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: [
-    'Content-Type',
-    'Authorization',
-    'X-Requested-With',
-    'Accept',
-    'Origin',
-  ],
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  // IMPORTANTE: Permite headers customizados para imagens
+  exposedHeaders: ['Content-Type', 'Content-Length'],
 };
 
-// Global Middlewares
-//set Security http headers
-app.use(helmet());
+// Apply CORS middleware - SÓ UMA VEZ!
+app.use(cors(corsOptions));
 
-//Development logging
+// Handle preflight requests
+app.options('*', cors(corsOptions));
+
+// 📸 SERVIR IMAGENS ESTÁTICAS - ANTES DE TUDO!
+app.use(
+  '/img',
+  express.static(path.join(__dirname, 'public/img'), {
+    // Headers específicos para imagens
+    setHeaders: (res, filePath) => {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Access-Control-Allow-Methods', 'GET');
+      res.setHeader('Cross-Origin-Resource-Policy', 'cross-origin');
+    },
+  })
+);
+
+// Set Security http headers (DEPOIS das imagens!)
+app.use(
+  helmet({
+    crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginEmbedderPolicy: false,
+  })
+);
+
+// Development logging
 if (process.env.NODE_ENV === 'development') {
-  app.use(morgan('dev')); //morgan é um middleware que loga as requ
+  app.use(morgan('dev'));
 }
 
-//Limit requests from the same api
+// Limit requests from the same api
 const limiter = rateLimit({
   max: 100,
   windowMs: 60 * 60 * 1000,
@@ -50,22 +71,21 @@ const limiter = rateLimit({
 
 app.use('/api', limiter);
 
-//Body parser, readiung data from body into req.body
-app.use(express.json({ limit: '10kb' })); //middleware, que permite que o express entenda o json que vem do cliente, e converte para um objeto javascript
+// Body parser, reading data from body into req.body
+app.use(express.json({ limit: '10kb' }));
 
-//Data sanitization against noSWL query injection
+// Data sanitization against noSQL query injection
 app.use(mongoSanitize());
 
-//Data sanitization against  crossSitescripting attacs XSS
+// Data sanitization against crossSitescripting attacks XSS
 app.use(xss());
 
-//Prevent parameter pullution
+// Prevent parameter pollution
 app.use(
   hpp({
     whitelist: [
       'duration',
       'ratingsAverage',
-      'duration',
       'ratingsQuantity',
       'maxGroupSize',
       'price',
@@ -73,32 +93,21 @@ app.use(
   })
 );
 
-// Apply CORS middleware
-app.use(cors(corsOptions));
-
-// Handle preflight requests
-app.options('*', cors(corsOptions));
-
-//Serving static files
-app.use(express.static(`${__dirname}/public`)); //middleware para servir arquivos estáticos, como imagens, css, js, etc. O __dirname é o diretório atual do arquivo app.js, e public é a pasta onde os arquivos estáticos estão
-
-//Test middleware
+// Test middleware
 app.use((req, res, next) => {
-  req.resquestTime = new Date().toISOString();
-  //console.log(req.headers);
+  req.requestTime = new Date().toISOString();
   next();
 });
 
-//3) Routes
-app.use('/', viewRouter);
-app.use('/api/v1/tours', tourRouter); //mounting the router, so all the routes that are defined in the tourRouter will be prefixed with /api/v1/tours
+// 3) Routes
+app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 
 app.all('*', (req, res, next) => {
-  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404)); //passar o erro para o middleware de tratamento de erros
-}); // <-- fecha o callback e a chamada app.all
+  next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));
+});
 
-app.use(globalErrorHandler); //middleware de tratamento de erros, que vai ser chamado sempre que o next for chamado com um argumento
+app.use(globalErrorHandler);
 
-module.exports = app; //exporting the app so it can be used in the server.js file
+module.exports = app;
