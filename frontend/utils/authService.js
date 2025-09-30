@@ -2,12 +2,13 @@ import axios from "axios";
 
 const API_BASE_URL = "http://localhost:3000/api/v1";
 
-// Configurar axios com base URL e interceptors
+// ✅ CONFIGURAR AXIOS PARA COOKIES
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
     "Content-Type": "application/json",
   },
+  withCredentials: true, // ✅ ISTO ENVIA COOKIES AUTOMATICAMENTE!
 });
 
 // Interceptor para adicionar token automaticamente
@@ -22,22 +23,19 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// ✅ INTERCEPTOR CORRIGIDO - SÓ FAZ LOGOUT EM CASOS ESPECÍFICOS
+// ✅ INTERCEPTOR CORRIGIDO
 api.interceptors.response.use(
   (response) => response.data,
   (error) => {
-    // ✅ MUDANÇA: Só fazer logout automático se for um token inválido/expirado
-    // E NÃO for um erro de login (que também dá 401)
     if (error.response?.status === 401) {
       const url = error.config?.url;
       const isLoginAttempt =
         url?.includes("/login") || url?.includes("/signup");
 
-      // ❌ NÃO fazer logout se for tentativa de login
       if (!isLoginAttempt) {
-        console.log("🚨 Token expired or invalid - logging out");
+        console.log("🚨 Token expired - logging out");
         authService.logout();
-        // ❌ REMOVER O REDIRECT FORÇADO
+        // Opcional: redirect suave sem reload
         // window.location.href = "/";
       }
     }
@@ -88,9 +86,20 @@ export const authService = {
   },
 
   // Logout
-  logout: () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+  // LOGOUT ATUALIZADO - limpa cookie + localStorage
+  logout: async () => {
+    try {
+      // 1 Chamar backend para limpar cookie
+      await api.post("/users/logout");
+      console.log("✅ Backend logout successful");
+    } catch (error) {
+      console.log("⚠️ Backend logout failed, but continuing with local logout");
+    } finally {
+      // 2 SEMPRE limpar localStorage (mesmo se backend falhe)
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+      console.log("✅ LocalStorage cleared");
+    }
   },
 
   // Get current user

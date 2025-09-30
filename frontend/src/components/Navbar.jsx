@@ -15,16 +15,34 @@ const Navbar = () => {
     }
   }, []);
 
-
   const handleAuthSuccess = (response) => {
     console.log("Auth success response:", response); // Para debug
     // O response já vem processado do authService
     setUser(response.data.user);
   };
 
-  const handleLogout = () => {
-    authService.logout();
-    setUser(null);
+  const handleLogout = async () => {
+    try {
+      console.log("🚀 Logging out...");
+
+      //  CHAMADA ASYNC para logout completo
+      await authService.logout();
+
+      //  Atualizar estado local
+      setUser(null);
+
+      console.log("✅ Logout completed successfully");
+
+       //Redirect para home
+      window.location.href = '/';
+    } catch (error) {
+      console.error("🚨 Logout error:", error);
+
+      //  FALLBACK: Se logout falhar, pelo menos limpa estado local
+      setUser(null);
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+    }
   };
 
   const getFirstName = (fullName) => {

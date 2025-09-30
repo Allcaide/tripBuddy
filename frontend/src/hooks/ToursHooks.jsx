@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import api from "../../utils/api";
+import api from "../../utils/authService";
 
 export const useTours = () => {
   const [tours, setTours] = useState([]);
@@ -17,7 +17,7 @@ export const useTours = () => {
         console.log("✅ Tours response:", response.data);
 
         // Guarda os dados no estado
-        setTours(response.data.data.data);
+        setTours(response.data.data);
       } catch (error) {
         console.error("🚨 Error fetching tours:", error);
         console.error("🚨 Error message:", error.message);

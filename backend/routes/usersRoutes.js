@@ -8,7 +8,7 @@ router.post('/signup', authController.signup);
 router.post('/login', authController.login);
 router.post('/forgotPassword', authController.forgotPassword);
 router.patch('/resetPassword/:token', authController.resetPassword);
-
+router.post('/logout', authController.logout);
 router.use(authController.protect); //O middleware é executado de seguida (cima para baixo) e tudo o que vier depois deste o user tem que estar autnticado
 
 router.patch('/updateMyPassword', authController.updatePassword);
