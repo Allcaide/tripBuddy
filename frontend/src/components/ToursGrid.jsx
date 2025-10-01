@@ -1,124 +1,144 @@
-import React, { useEffect, useRef } from "react";
+import React from "react";
 import TourCard from "./TourCard";
 
-// Imports do Vanta
-import * as THREE from "three";
-import FOG from "vanta/dist/vanta.fog.min";
-
-const ToursGrid = ({ tours, loading, error }) => {
-  const vantaRef = useRef(null);
-  const vantaEffect = useRef(null);
-
-  // Configurar Vanta effect quando o componente monta
-  useEffect(() => {
-    if (!vantaEffect.current && vantaRef.current) {
-      vantaEffect.current = FOG({
-        el: vantaRef.current,
-        THREE: THREE,
-        mouseControls: true,
-        touchControls: true,
-        gyroControls: false,
-        minHeight: 200.0,
-        minWidth: 200.0,
-        highlightColor: 0xd8eafa,
-        midtoneColor: 0xd5deff,
-        lowlightColor: 0xb9ceeb,
-        baseColor: 0xcacaca,
-        blurFactor: 0.86,
-        speed: 0.9,
-      });
-    }
-
-    // Cleanup quando o componente desmonta
-    return () => {
-      if (vantaEffect.current) {
-        vantaEffect.current.destroy();
-        vantaEffect.current = null;
-      }
+const ToursGrid = ({ tours, loading, error, errorType }) => {
+  const renderErrorMessage = () => {
+    const errorConfig = {
+      AUTH_REQUIRED: {
+        title: "Login Required",
+        buttonText: "Log In",
+        buttonAction: () => {
+          window.dispatchEvent(new CustomEvent("openLoginModal"));
+        },
+      },
+      ADMIN_REQUIRED: {
+        title: "Admin Access Required",
+        buttonText: "Contact Support",
+        buttonAction: () => (window.location.href = "/contact"),
+      },
+      GUIDE_REQUIRED: {
+        title: "Guide Access Required",
+        buttonText: "Apply to be a Guide",
+        buttonAction: () => (window.location.href = "/become-guide"),
+      },
+      TOKEN_INVALID: {
+        title: "Session Expired",
+        buttonText: "Log In Again",
+        buttonAction: () => {
+          localStorage.removeItem("token");
+          localStorage.removeItem("user");
+          window.dispatchEvent(new CustomEvent("openLoginModal"));
+        },
+      },
+      GENERAL: {
+        title: "Something went wrong",
+        buttonText: "Try Again",
+        buttonAction: () => window.location.reload(),
+      },
     };
-  }, []);
+
+    const config = errorConfig[errorType] || errorConfig.GENERAL;
+
+    return (
+      <div className="text-center bg-red-50 border border-red-200 rounded-2xl p-8 max-w-md mx-4">
+        <div className="text-4xl mb-4">{config.icon}</div>
+        <h2 className="text-xl font-bold text-red-700 mb-2">{config.title}</h2>
+        {/* ✅ USAR A MENSAGEM EXATA DO BACKEND */}
+        <p className="text-red-600 mb-4">{error}</p>
+        <button
+          onClick={config.buttonAction}
+          className="bg-red-500 hover:bg-red-600 text-white px-6 py-2 rounded-lg transition-colors"
+        >
+          {config.buttonText}
+        </button>
+      </div>
+    );
+  };
 
   if (loading) {
     return (
-      <>
-        {/* Vanta Background - atrás do Navbar */}
-        <div ref={vantaRef} className="fixed inset-0 w-full h-full z-[-1]" />
-
-        {/* Conteúdo original por cima - SEM filtros */}
-        <div className="relative z-10 flex justify-center items-center h-96">
-          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-600"></div>
+      <div className="min-h-screen bg-white flex justify-center items-center pt-20">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-20 w-20 border-b-4 border-blue-500 mx-auto mb-4"></div>
+          <p className="text-gray-600 font-medium">Loading amazing tours...</p>
         </div>
-      </>
+      </div>
     );
   }
 
   if (error) {
     return (
-      <>
-        {/* Vanta Background - atrás do Navbar */}
-        <div ref={vantaRef} className="fixed inset-0 w-full h-full z-[-1]" />
-
-        {/* Conteúdo original por cima - SEM filtros */}
-        <div className="relative z-10 flex justify-center items-center h-96">
-          <div className="text-red-500 text-center">
-            <p className="text-2xl font-bold">Error: {error}</p>
-          </div>
-        </div>
-      </>
+      <div className="min-h-screen bg-white flex justify-center items-center pt-20">
+        {renderErrorMessage()}
+      </div>
     );
   }
 
   return (
-    <>
-      {/* Vanta Background - atrás do Navbar */}
-      <div ref={vantaRef} className="fixed inset-0 w-full h-full z-[-1]" />
+    <div className="min-h-screen bg-white">
+      {/* Espaçamento para navbar floating */}
+      <div className="pt-24 pb-16">
+        {/* Header Section */}
+        <div className="text-center mb-16 px-4">
+          <h1 className="text-5xl sm:text-6xl font-bold text-gray-900 mb-6">
+            Discover Amazing Tours
+          </h1>
+          <p className="text-xl text-gray-600 max-w-3xl mx-auto leading-relaxed">
+            Explore breathtaking destinations with our curated collection of
+            unforgettable adventures around the world
+          </p>
+        </div>
 
-      {/* Conteúdo NORMAL - sem filtros glass */}
-      <div className="relative z-10 min-h-screen">
-        <div className="pt-24 pb-16">
-          <div className="text-center mb-16">
-            <h1 className="text-5xl font-bold text-gray-800 mb-4">
-              Discover Amazing Tours
-            </h1>
-            <p className="text-xl text-gray-600 max-w-2xl mx-auto">
-              Explore breathtaking destinations with our curated collection of
-              unforgettable adventures
-            </p>
-          </div>
-
-          {/* Grid responsivo */}
-          <div className="px-8">
+        {/* Tours Grid */}
+        <div className="px-4 sm:px-6 lg:px-8">
+          <div className="max-w-7xl mx-auto">
             <div
-              className="grid gap-8 
+              className="grid gap-6 
               grid-cols-1 
               sm:grid-cols-2 
               lg:grid-cols-3 
               xl:grid-cols-4 
               2xl:grid-cols-5 
-              place-items-center
-              max-w-[calc(100vw-4rem)] 
-              mx-auto"
+              place-items-center"
             >
-              {tours.map((tour) => (
-                <TourCard key={tour._id} tour={tour} />
-              ))}
-            </div>
-          </div>
-
-          {/* Stats footer - também normal */}
-          <div className="mt-20 text-center">
-            <div className="bg-white rounded-2xl shadow-lg p-8 max-w-md mx-auto">
-              <p className="text-2xl font-bold text-gray-800 mb-2">
-                {tours.length} Amazing Tours
-              </p>
-              <p className="text-gray-600">
-                Hover over cards to see full details
-              </p>
+              {/* ✅ SAFETY CHECK */}
+              {Array.isArray(tours) &&
+                tours.map((tour) => <TourCard key={tour._id} tour={tour} />)}
             </div>
           </div>
         </div>
+
+        {/* Stats Footer */}
+        <div className="mt-20 px-4">
+          <div className="max-w-md mx-auto text-center">
+            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8">
+              <div className="text-3xl font-bold text-gray-900 mb-2">
+                {Array.isArray(tours) ? tours.length : 0}
+              </div>
+              <div className="text-gray-600 font-medium mb-1">
+                Amazing Tours Available
+              </div>
+              <div className="text-sm text-gray-500">
+                Hover over cards to see full details
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Empty State */}
+        {Array.isArray(tours) && tours.length === 0 && !loading && !error && (
+          <div className="text-center py-20">
+            <div className="text-6xl mb-4">🏔️</div>
+            <h3 className="text-2xl font-bold text-gray-700 mb-2">
+              No tours available yet
+            </h3>
+            <p className="text-gray-500">
+              Check back soon for amazing adventures!
+            </p>
+          </div>
+        )}
       </div>
-    </>
+    </div>
   );
 };
 

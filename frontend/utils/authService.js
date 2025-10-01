@@ -33,16 +33,24 @@ api.interceptors.response.use(
         url?.includes("/login") || url?.includes("/signup");
 
       if (!isLoginAttempt) {
-        console.log("🚨 Token expired - logging out");
+        console.log("🚨 Token expired or invalid - logging out");
         authService.logout();
-        // Opcional: redirect suave sem reload
-        // window.location.href = "/";
       }
     }
 
+    // ✅ DETECTAR TIPO DE ERRO E CRIAR MENSAGEM ESPECÍFICA
     const errorMessage =
       error.response?.data?.message || error.message || "Something went wrong!";
-    return Promise.reject(new Error(errorMessage));
+    const statusCode = error.response?.status;
+
+    // Criar erro customizado com mais informações
+    const customError = new Error(errorMessage);
+    customError.statusCode = statusCode;
+    customError.isAuthError = statusCode === 401;
+    customError.isForbiddenError = statusCode === 403;
+    customError.originalError = error;
+
+    return Promise.reject(customError);
   },
 );
 

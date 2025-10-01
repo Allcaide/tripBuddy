@@ -5,30 +5,61 @@ export const useTours = () => {
   const [tours, setTours] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const [errorType, setErrorType] = useState(null);
 
   useEffect(() => {
     const fetchTours = async () => {
       try {
         setLoading(true);
         setError(null);
+        setErrorType(null);
 
         const response = await api.get("/tours");
+        console.log("✅ Tours response:", response);
 
-        console.log("✅ Tours response:", response.data);
+        // Encontrar o array de tours na estrutura
+        let toursArray = [];
+        if (Array.isArray(response.data)) {
+          toursArray = response.data;
+        } else if (Array.isArray(response.data?.data)) {
+          toursArray = response.data.data;
+        } else if (Array.isArray(response.data?.tours)) {
+          toursArray = response.data.tours;
+        }
 
-        // Guarda os dados no estado
-        setTours(response.data.data);
-      } catch (error) {
-        console.error("🚨 Error fetching tours:", error);
-        console.error("🚨 Error message:", error.message);
-        console.error("🚨 Response error:", error.response?.data);
+        setTours(toursArray);
+      } catch (err) {
+        console.error("🚨 Error fetching tours:", err);
 
-        // Guarda o erro no estado
-        setError(
-          error.response?.data?.message ||
-            error.message ||
-            "Something went wrong",
-        );
+        // ✅ USAR A MENSAGEM DIRETA DO BACKEND
+        const backendMessage = err.message;
+        console.log("📩 Backend message:", backendMessage);
+
+        // ✅ DETECTAR TIPO BASEADO NA MENSAGEM DO BACKEND
+        if (
+          backendMessage.includes("not logged in") ||
+          backendMessage.includes("Please log in")
+        ) {
+          setErrorType("AUTH_REQUIRED");
+        } else if (
+          backendMessage.includes("admin") ||
+          backendMessage.includes("administrator")
+        ) {
+          setErrorType("ADMIN_REQUIRED");
+        } else if (backendMessage.includes("guide")) {
+          setErrorType("GUIDE_REQUIRED");
+        } else if (
+          backendMessage.includes("jwt") ||
+          backendMessage.includes("token") ||
+          backendMessage.includes("malformed")
+        ) {
+          setErrorType("TOKEN_INVALID");
+        } else {
+          setErrorType("GENERAL");
+        }
+
+        // ✅ USAR A MENSAGEM EXATA DO BACKEND
+        setError(backendMessage);
       } finally {
         setLoading(false);
       }
@@ -37,5 +68,5 @@ export const useTours = () => {
     fetchTours();
   }, []);
 
-  return { tours, loading, error };
+  return { tours, loading, error, errorType };
 };

@@ -7,7 +7,7 @@ const Navbar = () => {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [user, setUser] = useState(null);
 
-  // Verificar se user está logado quando componente monta
+  // ✅ PRIMEIRO useEffect - Verificar se user está logado quando componente monta
   useEffect(() => {
     const currentUser = authService.getCurrentUser();
     if (currentUser) {
@@ -15,30 +15,39 @@ const Navbar = () => {
     }
   }, []);
 
+  // ✅ SEGUNDO useEffect - Listener para abrir modal
+  useEffect(() => {
+    const handleOpenLoginModal = () => {
+      setIsAuthModalOpen(true);
+    };
+
+    window.addEventListener("openLoginModal", handleOpenLoginModal);
+
+    return () => {
+      window.removeEventListener("openLoginModal", handleOpenLoginModal);
+    };
+  }, []);
+
+  // ATUALIZAR handleAuthSuccess para refresh
   const handleAuthSuccess = (response) => {
-    console.log("Auth success response:", response); // Para debug
-    // O response já vem processado do authService
+    console.log("Auth success response:", response);
     setUser(response.data.user);
+
+    // REFRESH DA PÁGINA APÓS LOGIN BEM SUCEDIDO
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000); // Pequeno delay para mostrar sucesso
   };
 
   const handleLogout = async () => {
     try {
       console.log("🚀 Logging out...");
-
-      //  CHAMADA ASYNC para logout completo
       await authService.logout();
-
-      //  Atualizar estado local
       setUser(null);
-
       console.log("✅ Logout completed successfully");
-
-       //Redirect para home
-      window.location.href = '/';
+      window.location.href = "/";
     } catch (error) {
       console.error("🚨 Logout error:", error);
-
-      //  FALLBACK: Se logout falhar, pelo menos limpa estado local
       setUser(null);
       localStorage.removeItem("token");
       localStorage.removeItem("user");
@@ -50,65 +59,68 @@ const Navbar = () => {
   };
 
   const getAvatarUrl = (userName) => {
-    // Placeholder avatar baseado no nome
     return `https://ui-avatars.com/api/?name=${encodeURIComponent(
       userName,
-    )}&background=3b82f6&color=fff&size=40&rounded=true`;
+    )}&background=007AFF&color=fff&size=40&rounded=true`;
   };
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 z-50 bg-gray-900/30 backdrop-blur-xl border-b border-white/10">
-        <div className="pl-8 pr-4 sm:pr-6 lg:pr-8">
-          <div className="flex justify-between items-center h-16">
+      {/*  NAVBAR FLOATING ESTILO APPLE */}
+      <nav className="fixed top-4 left-1/2 transform -translate-x-1/2 z-50 w-[95%] max-w-6xl">
+        <div className="bg-white/80 backdrop-blur-xl border border-white/20 rounded-2xl shadow-lg shadow-black/5 px-6 py-3">
+          <div className="flex justify-between items-center">
             {/* Logo */}
             <div className="flex-shrink-0">
               <Link
                 to="/"
-                className="flex items-center space-x-2 text-white font-bold text-xl"
+                className="flex items-center space-x-2 text-gray-900 font-bold text-xl"
               >
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white text-sm font-bold">TB</span>
+                </div>
                 <span>Trip Buddy</span>
               </Link>
             </div>
 
             {/* Menu Links */}
-            <div className="hidden md:flex items-center space-x-8">
+            <div className="hidden md:flex items-center space-x-1">
               <Link
                 to="/"
-                className="text-white/90 hover:text-white transition-colors font-medium"
+                className="text-gray-700 hover:text-gray-900 hover:bg-gray-100/60 transition-all font-medium px-4 py-2 rounded-xl"
               >
                 HOME
               </Link>
               <Link
                 to="/Tours"
-                className="text-white/90 hover:text-white transition-colors font-medium"
+                className="text-gray-700 hover:text-gray-900 hover:bg-gray-100/60 transition-all font-medium px-4 py-2 rounded-xl"
               >
                 TOURS
               </Link>
               <Link
                 to="/about"
-                className="text-white/90 hover:text-white transition-colors font-medium"
+                className="text-gray-700 hover:text-gray-900 hover:bg-gray-100/60 transition-all font-medium px-4 py-2 rounded-xl"
               >
                 ABOUT
               </Link>
               <Link
                 to="/contact"
-                className="text-white/90 hover:text-white transition-colors font-medium"
+                className="text-gray-700 hover:text-gray-900 hover:bg-gray-100/60 transition-all font-medium px-4 py-2 rounded-xl"
               >
                 CONTACT
               </Link>
 
               {/* Login/User Section */}
               {user ? (
-                <div className="flex items-center space-x-4">
+                <div className="flex items-center space-x-3 ml-4">
                   {/* User Info */}
-                  <div className="flex items-center space-x-3 bg-white/10 backdrop-blur-sm rounded-full px-4 py-2">
+                  <div className="flex items-center space-x-3 bg-gray-100/60 backdrop-blur-sm rounded-xl px-4 py-2">
                     <img
                       src={getAvatarUrl(user.name)}
                       alt={user.name}
-                      className="w-8 h-8 rounded-full"
+                      className="w-7 h-7 rounded-full ring-2 ring-blue-500/20"
                     />
-                    <span className="text-white font-medium">
+                    <span className="text-gray-900 font-medium text-sm">
                       {getFirstName(user.name)}
                     </span>
                   </div>
@@ -116,7 +128,7 @@ const Navbar = () => {
                   {/* Logout Button */}
                   <button
                     onClick={handleLogout}
-                    className="text-white/70 hover:text-white transition-colors"
+                    className="text-gray-600 hover:text-gray-900 hover:bg-gray-100/60 transition-all p-2 rounded-xl"
                     title="Logout"
                   >
                     <svg
@@ -137,7 +149,7 @@ const Navbar = () => {
               ) : (
                 <button
                   onClick={() => setIsAuthModalOpen(true)}
-                  className="bg-blue-600/80 hover:bg-blue-600 text-white px-4 py-2 rounded-lg transition-all font-medium backdrop-blur-sm"
+                  className="bg-blue-500 hover:bg-blue-600 text-white font-medium px-5 py-2.5 rounded-xl transition-all shadow-sm hover:shadow-md ml-4"
                 >
                   LOGIN
                 </button>
@@ -146,7 +158,7 @@ const Navbar = () => {
 
             {/* Mobile menu button */}
             <div className="md:hidden">
-              <button className="text-white/90 hover:text-white">
+              <button className="text-gray-600 hover:text-gray-900 hover:bg-gray-100/60 transition-all p-2 rounded-xl">
                 <svg
                   className="h-6 w-6"
                   fill="none"
@@ -166,11 +178,11 @@ const Navbar = () => {
         </div>
       </nav>
 
-      {/* Auth Modal - AGORA COM A FUNÇÃO CORRETA */}
+      {/* Auth Modal */}
       <AuthModal
         isOpen={isAuthModalOpen}
         onClose={() => setIsAuthModalOpen(false)}
-        onAuthSuccess={handleAuthSuccess} // ✅ AGORA PASSA A FUNÇÃO
+        onAuthSuccess={handleAuthSuccess}
       />
     </>
   );
