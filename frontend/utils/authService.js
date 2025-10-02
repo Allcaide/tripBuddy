@@ -23,9 +23,9 @@ api.interceptors.request.use(
   (error) => Promise.reject(error),
 );
 
-// ✅ INTERCEPTOR CORRIGIDO
+
 api.interceptors.response.use(
-  (response) => response.data,
+  (response) => response.data, //extrair os dados
   (error) => {
     if (error.response?.status === 401) {
       const url = error.config?.url;
@@ -38,7 +38,7 @@ api.interceptors.response.use(
       }
     }
 
-    // ✅ DETECTAR TIPO DE ERRO E CRIAR MENSAGEM ESPECÍFICA
+    //  DETECTAR TIPO DE ERRO E CRIAR MENSAGEM ESPECÍFICA
     const errorMessage =
       error.response?.data?.message || error.message || "Something went wrong!";
     const statusCode = error.response?.status;
