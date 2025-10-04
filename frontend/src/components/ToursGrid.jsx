@@ -108,23 +108,6 @@ const ToursGrid = ({ tours, loading, error, errorType }) => {
           </div>
         </div>
 
-        {/* Stats Footer */}
-        <div className="mt-20 px-4">
-          <div className="max-w-md mx-auto text-center">
-            <div className="bg-gray-50 border border-gray-200 rounded-2xl p-8">
-              <div className="text-3xl font-bold text-gray-900 mb-2">
-                {Array.isArray(tours) ? tours.length : 0}
-              </div>
-              <div className="text-gray-600 font-medium mb-1">
-                Amazing Tours Available
-              </div>
-              <div className="text-sm text-gray-500">
-                Hover over cards to see full details
-              </div>
-            </div>
-          </div>
-        </div>
-
         {/* Empty State */}
         {Array.isArray(tours) && tours.length === 0 && !loading && !error && (
           <div className="text-center py-20">

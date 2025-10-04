@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from "react";
+import { Link } from "react-router";
 import { parseLocationFromAddressWithCache } from "../../utils/locationUtils";
 
 const TourCard = ({ tour }) => {
@@ -37,7 +38,14 @@ const TourCard = ({ tour }) => {
   };
 
   return (
-    <div className="group relative w-full max-w-sm h-[32rem] cursor-pointer">
+    <div className="group relative w-full max-w-sm h-[32rem]">
+      {/* ✅ LINK COMO OVERLAY INVISÍVEL POR CIMA DE TUDO */}
+      <Link
+        to={`/Tours/${tour.slug}`}
+        className="absolute inset-0 z-50 cursor-pointer"
+        aria-label={`View details for ${tour.name}`}
+      />
+
       <div className="relative w-full h-full transform transition-all duration-500 ease-out group-hover:scale-105">
         {/* Imagem de fundo */}
         <div className="absolute inset-0 rounded-3xl overflow-hidden">
