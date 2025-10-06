@@ -4,6 +4,7 @@ import HomePage from "./pages/HomePage";
 import TourDetailPage from "./pages/TourDetailPage";
 import CreateTourPage from "./pages/CreateTourPage";
 import Tours from "./pages/Tours";
+import Me from "./pages/Me";
 import { Toaster, toast } from "react-hot-toast";
 
 const App = () => {
@@ -14,6 +15,7 @@ const App = () => {
         <Route path="/CreateTourPage" element={<CreateTourPage />}></Route>
         <Route path="/Tours" element={<Tours />}></Route>
         <Route path="/Tours/:slug" element={<TourDetailPage />}></Route>
+        <Route path="/Me" element={<Me />}></Route>
       </Routes>
     </div>
   );

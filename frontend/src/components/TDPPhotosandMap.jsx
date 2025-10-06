@@ -1,4 +1,5 @@
 import React from "react";
+import TourMap from "./mapTour";
 
 const TDPPhotosandMap = ({ tour }) => {
   if (!tour) return null;
@@ -64,14 +65,10 @@ const TDPPhotosandMap = ({ tour }) => {
       </div>
 
       {/* Map Placeholder */}
-      <div className="bg-gray-200 h-96 rounded-lg flex items-center justify-center">
-        <div className="text-center">
-          <span className="text-4xl mb-4 block">🗺️</span>
-          <p className="text-gray-600">Interactive Map</p>
-          <p className="text-sm text-gray-500">
-            Tour locations will be displayed here
-          </p>
-        </div>
+      <div className="mb-8">
+        <h2 className="text-2xl font-bold text-center mb-6">TOUR LOCATION</h2>
+
+        <TourMap tour={tour} />
       </div>
     </div>
   );
