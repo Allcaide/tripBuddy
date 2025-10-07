@@ -5,7 +5,6 @@ import TourDetailPage from "./pages/TourDetailPage";
 import CreateTourPage from "./pages/CreateTourPage";
 import Tours from "./pages/Tours";
 import Me from "./pages/Me";
-import { Toaster, toast } from "react-hot-toast";
 
 const App = () => {
   return (

@@ -114,7 +114,10 @@ const Navbar = () => {
               {user ? (
                 <div className="flex items-center space-x-3 ml-4">
                   {/* User Info */}
-                  <div className="flex items-center space-x-3 bg-gray-100/60 backdrop-blur-sm rounded-xl px-4 py-2">
+                  <Link
+                    to="/Me"
+                    className="flex items-center space-x-3 bg-gray-100/60 backdrop-blur-sm rounded-xl px-4 py-2"
+                  >
                     <img
                       src={getAvatarUrl(user.name)}
                       alt={user.name}
@@ -123,7 +126,7 @@ const Navbar = () => {
                     <span className="text-gray-900 font-medium text-sm">
                       {getFirstName(user.name)}
                     </span>
-                  </div>
+                  </Link>
 
                   {/* Logout Button */}
                   <button
