@@ -14,6 +14,7 @@ const MeSettings = ({ user, onUserUpdate }) => {
 
   useEffect(() => {
     if (user) {
+      console.log("🔍 MeSettings - User photo:", user.photo); //
       setFormData({
         name: user.name || "",
         email: user.email || "",

@@ -1,4 +1,5 @@
 const express = require('express');
+
 const userController = require('./../controllers/userController');
 const authController = require('./../controllers/authController');
 
@@ -13,11 +14,15 @@ router.use(authController.protect); //O middleware é executado de seguida (cima
 
 router.patch('/updateMyPassword', authController.updatePassword);
 router.get('/me', userController.getMe, userController.getUser);
-router.patch('/updateMe', userController.updateMe);
+router.patch(
+  '/updateMe',
+  userController.uploadUserPhoto,
+  userController.updateMe
+);
 
 router.delete('/deleteMe', userController.deleteMe);
 
-router.use(authController.restrictTo('admin'));//Daqui para baixo só admin é que consegue executar estes pedidos
+router.use(authController.restrictTo('admin')); //Daqui para baixo só admin é que consegue executar estes pedidos
 
 router
   .route('/')

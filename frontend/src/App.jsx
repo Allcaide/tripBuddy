@@ -1,22 +1,29 @@
-import React from "react";
-import { Route, Routes } from "react-router";
+import React, { useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router";
 import HomePage from "./pages/HomePage";
-import TourDetailPage from "./pages/TourDetailPage";
-import CreateTourPage from "./pages/CreateTourPage";
 import Tours from "./pages/Tours";
+import TourDetailPage from "./pages/TourDetailPage";
 import Me from "./pages/Me";
+import { setAuthToken } from "../utils/authService";
 
 const App = () => {
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setAuthToken(token);
+      console.log("Token loaded from localStorage on app start");
+    }
+  }, []);
+
   return (
-    <div>
+    <Router>
       <Routes>
-        <Route path="/" element={<HomePage />}></Route>
-        <Route path="/CreateTourPage" element={<CreateTourPage />}></Route>
-        <Route path="/Tours" element={<Tours />}></Route>
-        <Route path="/Tours/:slug" element={<TourDetailPage />}></Route>
-        <Route path="/Me" element={<Me />}></Route>
+        <Route path="/" element={<HomePage />} />
+        <Route path="/Tours" element={<Tours />} />
+        <Route path="/Tours/:slug" element={<TourDetailPage />} />
+        <Route path="/Me" element={<Me />} />
       </Routes>
-    </div>
+    </Router>
   );
 };
 
