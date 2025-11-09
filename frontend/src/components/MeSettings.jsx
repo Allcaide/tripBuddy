@@ -9,12 +9,14 @@ const MeSettings = ({ user, onUserUpdate }) => {
     newPassword: "",
     confirmPassword: "",
   });
+  const [selectedPhoto, setSelectedPhoto] = useState(null);
+  const [photoPreview, setPhotoPreview] = useState(null);
   const [loading, setLoading] = useState(false);
   const [message, setMessage] = useState({ type: "", text: "" });
 
   useEffect(() => {
     if (user) {
-      console.log("🔍 MeSettings - User photo:", user.photo); //
+      console.log("🔍 MeSettings - User photo:", user.photo);
       setFormData({
         name: user.name || "",
         email: user.email || "",
@@ -32,15 +34,39 @@ const MeSettings = ({ user, onUserUpdate }) => {
     });
   };
 
+  const handlePhotoChange = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      setSelectedPhoto(file);
+
+      // Criar preview da imagem
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setPhotoPreview(reader.result);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleSubmitProfile = async (e) => {
     e.preventDefault();
     setLoading(true);
     setMessage({ type: "", text: "" });
 
     try {
-      const response = await api.patch("/users/updateMe", {
-        name: formData.name,
-        email: formData.email,
+      const formDataToSend = new FormData();
+      formDataToSend.append("name", formData.name);
+      formDataToSend.append("email", formData.email);
+
+      // Adiciona a foto se foi selecionada
+      if (selectedPhoto) {
+        formDataToSend.append("photo", selectedPhoto);
+      }
+
+      const response = await api.patch("/users/updateMe", formDataToSend, {
+        headers: {
+          "Content-Type": "multipart/form-data",
+        },
       });
 
       const updatedUser = response.data.user;
@@ -50,7 +76,14 @@ const MeSettings = ({ user, onUserUpdate }) => {
         onUserUpdate(updatedUser);
       }
 
+      // Limpa a foto selecionada e preview
+      setSelectedPhoto(null);
+      setPhotoPreview(null);
+
       setMessage({ type: "success", text: "Profile updated successfully!" });
+      setTimeout(() => {
+        window.location.reload();
+      }, 1000);
     } catch (error) {
       console.error("Error updating profile:", error);
       setMessage({
@@ -183,19 +216,34 @@ const MeSettings = ({ user, onUserUpdate }) => {
           <div className="flex items-center space-x-4">
             <img
               src={
-                user?.photo
-                  ? `http://localhost:3000/img/users/${user.photo}`
-                  : `https://ui-avatars.com/api/?name=${user?.name}&background=3b82f6&color=fff&size=128`
+                photoPreview ||
+                (user?.photo
+                  ? `http://localhost:3000/img/users/${
+                      user.photo
+                    }?t=${Date.now()}`
+                  : `https://ui-avatars.com/api/?name=${user?.name}&background=3b82f6&color=fff&size=128`)
               }
               alt={user?.name}
               className="w-20 h-20 rounded-full object-cover"
             />
-            <button
-              type="button"
-              className="text-blue-500 hover:text-blue-600 font-semibold"
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handlePhotoChange}
+              className="hidden"
+              id="photo-upload"
+            />
+            <label
+              htmlFor="photo-upload"
+              className="text-blue-500 hover:text-blue-600 font-semibold cursor-pointer"
             >
               Choose new photo
-            </button>
+            </label>
+            {selectedPhoto && (
+              <span className="text-sm text-gray-600">
+                {selectedPhoto.name}
+              </span>
+            )}
           </div>
         </div>
 
