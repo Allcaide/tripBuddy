@@ -42,15 +42,19 @@ module.exports = class Email {
       url: this.url,
     });
 
-    const html = render(emailElement);
+    let html =await render(emailElement);
+
+    //  Converte para string antes de usar replace
+    const htmlString = typeof html === 'string' ? html : String(html);
+    const textVersion = htmlString.replace(/<[^>]*>/g, '');
 
     // 2) Define email options
     const mailOptions = {
       from: this.from,
       to: this.to,
       subject,
-      html,
-      text: html.replace(/<[^>]*>/g, ''), // Remove HTML tags para versão texto
+      html: htmlString,
+      text: textVersion,
     };
 
     // 3) Send email
