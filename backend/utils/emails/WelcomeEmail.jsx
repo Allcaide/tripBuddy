@@ -44,7 +44,7 @@ const WelcomeEmail = ({ firstName, url }) => {
           React.createElement(
             Text,
             { style: paragraphStyle },
-            'Start your journey by browsing our curated tours:',
+            'Start your journey by browsing our the available tours:',
           ),
           React.createElement(
             Button,
