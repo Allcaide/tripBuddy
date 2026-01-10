@@ -33,7 +33,7 @@ router
   .get(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide', 'guide'),
-    tourController.getMonthStats
+    tourController.getMonthStats,
   );
 
 router
@@ -47,11 +47,11 @@ router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
 
 router
   .route('/')
-  .get(authController.protect, tourController.getAllTours)
+  .get(tourController.getAllTours)
   .post(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
-    tourController.addNewTour
+    tourController.addNewTour,
   );
 router
   .route('/:id')
@@ -61,12 +61,12 @@ router
     authController.restrictTo('admin', 'lead-guide'),
     tourController.uploadTourImages,
     tourController.resizeTourImages,
-    tourController.updateTour
+    tourController.updateTour,
   )
   .delete(
     authController.protect,
     authController.restrictTo('admin', 'lead-guide'),
-    tourController.deleteTour
+    tourController.deleteTour,
   );
 
 router.get('/slug/:slug', tourController.getTourBySlug);
