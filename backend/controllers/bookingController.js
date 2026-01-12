@@ -15,29 +15,28 @@ exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 2) Create checkout session
   const session = await stripe.checkout.sessions.create({
     payment_method_types: ['card'],
-    // Usa variável de ambiente para URLs
-    success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/?tour=${tour.id}&price=${tour.price}`,
-    cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/tour/${tour.slug}`,
+    // ✅ URLs apontam para o FRONTEND, não para o backend
+    success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/?tour=${tour.slug}&user=${req.user.id}&price=${tour.price}`,
+    cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/tours/${tour.slug}`,
     customer_email: req.user.email,
     client_reference_id: req.params.tourId,
+    mode: 'payment',
     line_items: [
       {
         price_data: {
           currency: 'eur',
+          unit_amount: tour.price * 100,
           product_data: {
             name: `${tour.name} Tour`,
             description: tour.summary,
             images: [
-              // URL corrigida para a imagem
               `${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`,
             ],
           },
-          unit_amount: tour.price * 100, // Stripe usa centavos
         },
         quantity: 1,
       },
     ],
-    mode: 'payment',
   });
 
   // 3) Send session as response

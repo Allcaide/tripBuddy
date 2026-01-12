@@ -1,11 +1,10 @@
 import React, { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
 import { authService } from "../../utils/authService";
+import { bookTour } from "../js/stripe";
 
 const TDPDetails = ({ tour }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(false);
-  const navigate = useNavigate();
 
   // ✅ Verificar se user está logado quando componente monta (igual à Navbar)
   useEffect(() => {
@@ -24,36 +23,16 @@ const TDPDetails = ({ tour }) => {
       return;
     }
 
+    const token = localStorage.getItem("token");
+    if (!token) {
+      window.dispatchEvent(new Event("openLoginModal"));
+      return;
+    }
+
     try {
       setLoading(true);
-
-      // Obter token do localStorage
-      const token = localStorage.getItem("token");
-      if (!token) {
-        window.dispatchEvent(new Event("openLoginModal"));
-        return;
-      }
-
-      // Chama a API para criar checkout session
-      const response = await fetch(
-        `http://localhost:3000/api/v1/bookings/checkout-session/${tour._id}`,
-        {
-          method: "GET",
-          headers: {
-            Authorization: `Bearer ${token}`,
-            "Content-Type": "application/json",
-          },
-        },
-      );
-
-      if (!response.ok) {
-        throw new Error("Failed to create checkout session");
-      }
-
-      const data = await response.json();
-
-      // Redireciona para Stripe Checkout
-      window.location.href = data.session.url;
+      // ✅ Usa o helper stripe.js para abrir a checkout session
+      await bookTour(tour._id, token);
     } catch (error) {
       console.error("Booking error:", error);
       alert("Failed to start booking process. Please try again.");
