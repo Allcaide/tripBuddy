@@ -1,61 +1,70 @@
-# Logs
-logs
+# ==================== AMBIENTE E CREDENCIAIS ====================
+# NUNCA fazer commit de ficheiros com variáveis de ambiente
+config.env
+docker.env
+.env
+.env.local
+.env.*.local
+.env.production.local
+.env.development.local
+credentials.json
+secrets.json
+
+# ==================== DEPENDÊNCIAS ====================
+node_modules/
+package-lock.json
+yarn.lock
+pnpm-lock.yaml
+*.tgz
+
+# ==================== BUILD/OUTPUT ====================
+dist/
+dist-ssr/
+build/
+out/
+coverage/
+*.local
+
+# ==================== LOGS ====================
+logs/
 *.log
 npm-debug.log*
 yarn-debug.log*
-yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
-**/package-lock.json
+# ==================== CACHE ====================
+.cache/
+.vite/
+.next/
+storybook-static/
+jest-coverage/
 
-node_modules
-dist
-dist-ssr
-*.local
-
-*.mp4
-# Editor directories and files
+# ==================== EDITOR ====================
 .vscode/*
 !.vscode/extensions.json
-.idea
-.DS_Store
+.idea/
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
 
-
-.env
-.env.* 
-*.env.local
-
-# Build/output extra
-build/
-coverage/
-*.tgz
-
-# Cache do Vite/React/Parcel
-.cache/
-.vite/
-.next/
-out/
-storybook-static/
-
-# Relatórios de testes
-coverage/
-jest-coverage/
-
-# Relatórios do npm
-npm-debug.log*
-yarn-debug.log*
-pnpm-debug.log*
-
-# Mac/Linux/Windows system files
+# ==================== SISTEMA ====================
+.DS_Store
 Thumbs.db
 ehthumbs.db
-*.DS_Store
 *.AppleDouble
 *.LSOverride
 Icon?
+
+# ==================== MEDIA ====================
+*.mp4
+*.mov
+*.avi
+
+# ==================== IDE ====================
+.vscode/settings.json
+.vscode/launch.json
+.vscode/extensions.json
+.vscode/tasks.json
