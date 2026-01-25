@@ -15,3 +15,17 @@ exports.createReview = factory.createOne(Review);
 exports.getReview = factory.getOne(Review);
 exports.updateReview = factory.updateOne(Review);
 exports.deleteReview = factory.deleteOne(Review);
+
+exports.getMyReviews = catchAsync(async (req, res, next) => {
+  const reviews = await Review.find({ user: req.user.id })
+    .populate('tour')
+    .populate('user');
+
+  res.status(200).json({
+    status: 'success',
+    results: reviews.length,
+    data: {
+      data: reviews,
+    },
+  });
+});

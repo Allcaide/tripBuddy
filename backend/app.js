@@ -25,6 +25,7 @@ const corsOptions = {
     'http://127.0.0.1:5173',
     'http://127.0.0.1:3000',
   ],
+  
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
   allowedHeaders: ['Content-Type', 'Authorization'],
@@ -37,6 +38,13 @@ app.use(cors(corsOptions));
 
 // Handle preflight requests
 app.options('*', cors(corsOptions));
+
+// Webhook endpoint deve estar ANTES do body parser, senão o Stripe não consegue verificar a assinatura
+app.post('/api/v1/bookings/webhook-checkout', 
+  express.raw({type: 'application/json'}), 
+  require('./controllers/bookingController').webhookCheckout
+);
+
 
 // 📸 SERVIR IMAGENS ESTÁTICAS - ANTES DE TUDO!
 app.use(
@@ -104,10 +112,10 @@ app.use((req, res, next) => {
 });
 
 // 3) Routes
+app.use('/api/v1/bookings', bookingRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
-app.use('/api/v1/bookings', bookingRouter);
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

@@ -12,14 +12,10 @@ const api = axios.create({
 // Interceptor para requests (adicionar headers, auth, etc.)
 api.interceptors.request.use(
   (config) => {
-    // Adiciona timestamp para debug
-
-    // Se tiveres token de autenticação, adiciona aqui:
-    // const token = localStorage.getItem('token');
-    // if (token) {
-    //   config.headers.Authorization = `Bearer ${token}`;
-    // }
-
+    const token = localStorage.getItem("token"); // ✅ Mude de 'jwt' para 'token'
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`;
+    }
     return config;
   },
   (error) => {
@@ -27,7 +23,6 @@ api.interceptors.request.use(
     return Promise.reject(error);
   },
 );
-
 // Interceptor para responses (tratamento de erros global)
 api.interceptors.response.use(
   (response) => {
