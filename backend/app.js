@@ -65,7 +65,10 @@ const corsOptions = {
 // Apply CORS middleware - SÓ UMA VEZ!
 app.use(cors(corsOptions));
 
-
+// NOTE: static frontend serving is handled once, after API routes below.
+// The previous implementation had multiple, duplicated handlers and an
+// unconditional catch-all that caused incorrect behavior when the
+// `frontend/dist` directory didn't exist or was in a different path.
 
 // Handle preflight requests
 app.options('*', cors(corsOptions));
@@ -149,12 +152,17 @@ app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 
-// Serve frontend build if present inside the container at /app/frontend/dist
-const frontendDist = path.join(__dirname, 'frontend', 'dist');
-if (fs.existsSync(frontendDist)) {
-  app.use(express.static(frontendDist));
+// Serve frontend build if present inside the container or sibling folder.
+const possibleDistPaths = [
+  path.join(__dirname, 'frontend', 'dist'),
+  path.join(__dirname, '..', 'frontend', 'dist'),
+  path.join(__dirname, '../frontend/dist'),
+];
+let builtFrontendPath = possibleDistPaths.find((p) => fs.existsSync(p));
+if (builtFrontendPath) {
+  app.use(express.static(builtFrontendPath));
   app.get(/^\/(?!api).*/, (req, res) => {
-    res.sendFile(path.join(frontendDist, 'index.html'));
+    res.sendFile(path.join(builtFrontendPath, 'index.html'));
   });
 }
 
