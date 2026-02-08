@@ -1,8 +1,10 @@
 import axios from "axios";
 
-// Instância configurada do axios
+// Use Vite env or empty string so requests are relative in production
+const baseURL = import.meta.env.VITE_API_BASE_URL || "";
+
 const api = axios.create({
-  baseURL: "http://localhost:3000/api/v1",
+  baseURL: baseURL,
   timeout: 10000,
   headers: {
     "Content-Type": "application/json",
@@ -26,7 +28,6 @@ api.interceptors.request.use(
 // Interceptor para responses (tratamento de erros global)
 api.interceptors.response.use(
   (response) => {
-    console.log(`✅ API Response: ${response.status} ${response.config.url}`);
     return response;
   },
   (error) => {

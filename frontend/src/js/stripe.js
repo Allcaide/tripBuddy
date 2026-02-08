@@ -4,7 +4,7 @@ const pk = import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY;
 
 export async function bookTour(tourId, token) {
   const res = await fetch(
-    `http://localhost:3000/api/v1/bookings/checkout-session/${tourId}`,
+    `/api/v1/bookings/checkout-session/${tourId}`,
     {
       method: "GET",
       headers: {

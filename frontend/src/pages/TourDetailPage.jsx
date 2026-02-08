@@ -21,12 +21,11 @@ function ToursDetailPage() {
         setLoading(true);
         setError(null);
 
-        console.log("🔍 Fetching tour with slug:", slug);
 
         // ✅ NOVO ENDPOINT PARA SLUG
         const response = await api.get(`/tours/slug/${slug}`);
 
-        console.log("✅ Tour found:", response);
+        
         setTour(response.data.doc);
       } catch (err) {
         console.error("🚨 Error:", err);

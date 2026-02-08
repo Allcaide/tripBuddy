@@ -13,8 +13,7 @@ const TourCard = ({ tour }) => {
       );
       setLocation(parsedLocation);
     } else {
-      console.log(`❌ Sem address para o tour: ${tour.name}`);
-      console.log(`🔍 startLocation disponível:`, tour.startLocation);
+      
     }
   }, [tour.startLocation]);
 
@@ -22,12 +21,12 @@ const TourCard = ({ tour }) => {
   const getImageSrc = () => {
     // Se tour tem imageCover, usa essa
     if (tour.imageCover) {
-      return `http://localhost:3000/img/tours/${tour.imageCover}`;
+      return `/img/tours/${tour.imageCover}`;
     }
 
     // Senão, gera baseado no padrão tour-X-cover.jpg
     const tourNumber = tour.tourNumber || extractTourNumber(tour._id) || 1;
-    return `http://localhost:3000/img/tours/tour-${tourNumber}-cover.jpg`;
+    return `/img/tours/tour-${tourNumber}-cover.jpg`;
   };
 
   // Função auxiliar para extrair número do tour do ID
@@ -53,22 +52,17 @@ const TourCard = ({ tour }) => {
             src={getImageSrc()}
             alt={tour.name}
             className="w-full h-full object-cover"
-            onError={(e) => {
+              onError={(e) => {
               const currentSrc = e.target.src;
-              console.log("❌ Falhou:", currentSrc);
 
               if (currentSrc.includes("cover.jpg")) {
-                // Tenta tour-X-1.jpg
                 const baseName = currentSrc.replace("-cover.jpg", "-1.jpg");
-                console.log("🔄 Tentando -1.jpg:", baseName);
                 e.target.src = baseName;
               } else if (currentSrc.includes("-1.jpg")) {
                 e.target.src = currentSrc.replace("-1.jpg", "-2.jpg");
               } else if (currentSrc.includes("-2.jpg")) {
                 e.target.src = currentSrc.replace("-2.jpg", "-3.jpg");
               } else {
-                // Último recurso: esconde imagem e mostra fallback
-                console.log("🎨 Usando fallback gradiente");
                 e.target.style.display = "none";
                 e.target.nextSibling.style.display = "flex";
               }

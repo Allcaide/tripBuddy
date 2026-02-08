@@ -57,7 +57,7 @@ const TDPPhotosandMap = ({ tour }) => {
         {tour.images?.map((image, index) => (
           <img
             key={index}
-            src={`http://localhost:3000/img/tours/${image}`}
+            src={`/img/tours/${image}`}
             alt={`Tour ${index + 1}`}
             className="w-full h-64 object-cover rounded-lg"
           />

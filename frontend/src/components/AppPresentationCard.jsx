@@ -12,8 +12,6 @@ const AppPresentationCard = () => {
             alt="tripBuddy Symbol"
             className="w-32 h-32 object-contain" // ✅ Muito maior - quase todo o círculo
             onError={(e) => {
-              // Fallback para emoji se imagem não carregar
-              console.log("Image failed to load:", e.target.src);
               e.target.style.display = "none";
               e.target.nextSibling.style.display = "flex";
             }}

@@ -44,7 +44,6 @@ export const parseLocationFromAddress = (address) => {
   }
 
   // Se não conseguimos fazer parsing
-  console.log(`❌ Não foi possível fazer parsing de: "${address}"`);
   return {
     city: "Unknown City",
     country: "Unknown Country",
@@ -71,7 +70,7 @@ export const parseLocationFromAddressWithCache = (address) => {
 // Função para limpar cache
 export const clearAddressCache = () => {
   addressCache.clear();
-  console.log("🧹 Cache de addresses limpo");
+  
 };
 
 // Manter as funções antigas comentadas para referência se precisarmos

@@ -9,10 +9,8 @@ const TDPReviews = ({ tour }) => {
         {tour.reviews?.map((review, index) => (
           <div key={index} className="bg-white p-6 rounded-lg">
             <div className="flex items-center mb-4">
-              <img
-                src={`http://localhost:3000/img/users/${
-                  review.user?.photo || "default.jpg"
-                }`}
+                <img
+                  src={`/img/users/${review.user?.photo || "default.jpg"}`}
                 alt={review.user?.name || "User"}
                 className="w-12 h-12 rounded-full mr-4"
                 onError={(e) => {

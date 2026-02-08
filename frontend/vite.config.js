@@ -5,13 +5,19 @@ import react from "@vitejs/plugin-react";
 export default defineConfig({
   plugins: [react()],
   server: {
+    host: true,
+    port: 5173,
     proxy: {
-      "/api": { target: "http://backend:3000", changeOrigin: true },
+      '/api': {
+        target: 'http://backend:3000',
+        changeOrigin: true,
+        secure: false,
+      },
+      '/img': {
+        target: 'http://backend:3000',
+        changeOrigin: true,
+        secure: false,
+      },
     },
-    allowedHosts: [
-      "localhost",
-      "127.0.0.1",
-      "elliptical-transcursively-melita.ngrok-free.dev", // Adiciona o teu ngrok aqui
-    ],
   },
 });

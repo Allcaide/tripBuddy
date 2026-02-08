@@ -11,7 +11,6 @@ function MeBookings() {
       try {
         setLoading(true);
         const response = await api.get("/bookings/my-bookings");
-        console.log("🔍 Bookings encontradas:", response.data.data.data);
         setBookings(response.data.data.data);
         setError(null);
       } catch (err) {

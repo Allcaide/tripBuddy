@@ -16,7 +16,6 @@ const MeSettings = ({ user, onUserUpdate }) => {
 
   useEffect(() => {
     if (user) {
-      console.log("🔍 MeSettings - User photo:", user.photo);
       setFormData({
         name: user.name || "",
         email: user.email || "",
@@ -121,14 +120,14 @@ const MeSettings = ({ user, onUserUpdate }) => {
         passwordConfirm: formData.confirmPassword,
       });
 
-      console.log("Password updated, now re-logging in...");
+      
 
       const loginResponse = await api.post("/users/login", {
         email: user.email,
         password: formData.newPassword,
       });
 
-      console.log("Re-login successful");
+      
 
       const newToken = loginResponse.token;
       const updatedUser = loginResponse.data.user;
@@ -218,9 +217,7 @@ const MeSettings = ({ user, onUserUpdate }) => {
               src={
                 photoPreview ||
                 (user?.photo
-                  ? `http://localhost:3000/img/users/${
-                      user.photo
-                    }?t=${Date.now()}`
+                  ? `/img/users/${user.photo}?t=${Date.now()}`
                   : `https://ui-avatars.com/api/?name=${user?.name}&background=3b82f6&color=fff&size=128`)
               }
               alt={user?.name}

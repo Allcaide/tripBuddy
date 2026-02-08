@@ -144,7 +144,6 @@ exports.getTourStats = catchAsync(async (req, res) => {
 
 exports.getMonthStats = catchAsync(async (req, res) => {
   const year = req.params.year * 1; // Convert year to number
-  //console.log(year); Até aqui está certo
   const plan = await Tour.aggregate([
     //https://www.mongodb.com/pt-br/docs/manual/aggregation/
     //https://www.mongodb.com/pt-br/docs/manual/reference/mql/aggregation-stages/#std-label-aggregation-pipeline-operator-reference
@@ -209,7 +208,7 @@ exports.getToursWithin = catchAsync(async (req, res, next) => {
       )
     );
   }
-  // console.log(distance, lat, lng, unit),
+  
   const tours = await Tour.find({
     startLocation: { $geoWithin: { $centerSphere: [[lng, lat], radius] } }, //https://www.mongodb.com/pt-br/docs/manual/reference/operator/query/geoWithin/#mongodb-query-op.-geoWithin
   });

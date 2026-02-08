@@ -23,7 +23,6 @@ const handleJWTExpiredError = () =>
   new AppError('Expired Token. Please log in again.', 401);
 
 const sendErrorDev = (err, res) => {
-  console.log('ERROR 💥', err);
   return res.status(err.statusCode).json({
     status: err.status,
     error: err,
@@ -46,7 +45,7 @@ const sendErrorProd = (err, res) => {
     console.error('ERROR 💥', err);
     //2) Send generic message
     // console.error('ERROR 💥', err
-    // console.log('ERROR 💥', err.name);
+    
 
     res.status(500).json({
       status: 'error',
@@ -58,7 +57,7 @@ const sendErrorProd = (err, res) => {
 module.exports = (err, req, res, next) => {
   err.statusCode = err.statusCode || 500;
   err.status = err.status || 'error';
-  console.log(err.name, err.message);
+  
   if (process.env.NODE_ENV === 'development') {
     sendErrorDev(err, res);
   } else if (process.env.NODE_ENV === 'production') {

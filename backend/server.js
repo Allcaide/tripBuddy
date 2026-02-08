@@ -3,9 +3,8 @@ const dotenv = require('dotenv'); //importing dotenv to use environment variable
 dotenv.config({ path: './config.env' }); //configuring dotenv to use the config.env file
 
 process.on('uncaughtException', (err) => {
-  console.log(err.name, err.message);
-  //handling unhandled promise rejections
-  console.log('UNCAUGHT EXCEPTION! 💥 Shutting down...');
+  console.error(err.name, err.message);
+  console.error('UNCAUGHT EXCEPTION! 💥 Shutting down...');
   process.exit(1); //exiting the application
 });
 
@@ -25,20 +24,22 @@ mongoose
     useFindAndModify: false,
     dbName: 'tripbuddy',
   })
-  .then(() => console.log('DB connection successful'));
+  .then(() => console.info('DB connection successful'));
 
-// console.log(process.env); //checking the environment, if it is development or production
+// environment variables are intentionally not logged
 
 const port = process.env.PORT || 3000;
 const server = app.listen(port, '0.0.0.0', () => {
+    const localUrl = `http://127.0.0.1:${port}`;
+  console.info(`Servers running on ${localUrl}`);
   //initializing the server, listening
-  console.log(`Server is running on port ${port}...`);
+  console.info(`Server is running on port ${port}...`);
 });
 
 process.on('unhandledRejection', (err) => {
-  console.log(err.name, err.message);
-  //handling unhandled promise rejections
-  console.log('UNHANDLED REJECTION! 💥 Shutting down...');
+  console.error(err.name, err.message);
+  console.error('UNHANDLED REJECTION! 💥 Shutting down...');
+
 
   server.close(() => {
     process.exit(1); //

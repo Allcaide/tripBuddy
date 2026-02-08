@@ -1,7 +1,6 @@
 import axios from "axios";
 
-const API_BASE_URL =
-  import.meta.env.VITE_API_BASE_URL || "http://localhost:3000/api/v1";
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "";
 
 const api = axios.create({
   baseURL: API_BASE_URL,
@@ -15,10 +14,8 @@ const api = axios.create({
 export const setAuthToken = (token) => {
   if (token) {
     api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-    console.log("Token set in axios headers");
   } else {
     delete api.defaults.headers.common["Authorization"];
-    console.log("Token removed from axios headers");
   }
 };
 
@@ -44,7 +41,6 @@ api.interceptors.response.use(
       const isPasswordUpdate = url?.includes("/updateMyPassword");
 
       if (!isLoginAttempt && !isPasswordUpdate) {
-        console.log("Token expired or invalid - logging out");
         authService.logout();
       }
     }
@@ -103,14 +99,11 @@ export const authService = {
   logout: async () => {
     try {
       await api.post("/users/logout");
-      console.log("Backend logout successful");
     } catch (error) {
-      console.log("Backend logout failed, but continuing with local logout");
     } finally {
       localStorage.removeItem("token");
       localStorage.removeItem("user");
       setAuthToken(null);
-      console.log("LocalStorage cleared");
     }
   },
 

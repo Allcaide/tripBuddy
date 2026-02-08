@@ -15,7 +15,6 @@ export const useTours = () => {
         setErrorType(null);
 
         const response = await api.get("/tours");
-        console.log("✅ Tours response:", response);
 
         // Encontrar o array de tours na estrutura
         let toursArray = [];
@@ -33,7 +32,6 @@ export const useTours = () => {
 
         // ✅ USAR A MENSAGEM DIRETA DO BACKEND
         const backendMessage = err.message;
-        console.log("📩 Backend message:", backendMessage);
 
         // ✅ DETECTAR TIPO BASEADO NA MENSAGEM DO BACKEND
         if (

@@ -13,139 +13,134 @@ function MeReviews() {
   });
   const [submitting, setSubmitting] = useState(false);
 
-  // Buscar minhas reviews
-  useEffect(() => {
-    const fetchMyReviews = async () => {
-      try {
-        setLoadingReviews(true);
-        const response = await api.get("/reviews/my-reviews");
-        console.log("🔍 Minhas reviews:", response.data.data.data);
-        setMyReviews(response.data.data.data || []);
-      } catch (err) {
-        console.error("🔍 Erro ao buscar minhas reviews:", err);
-      } finally {
-        setLoadingReviews(false);
-      }
-    };
+  // Buscar minhas reviews (retorna array para uso posterior)
+  const fetchMyReviews = async () => {
+    try {
+      setLoadingReviews(true);
+      const response = await api.get("/reviews/my-reviews");
+      const reviews = response?.data?.data?.data || [];
+      setMyReviews(reviews);
+      return reviews;
+    } catch (err) {
+      console.error("Erro ao buscar minhas reviews:", err);
+      return [];
+    } finally {
+      setLoadingReviews(false);
+    }
+  };
 
+  useEffect(() => {
     fetchMyReviews();
   }, []);
 
   // Buscar bookings e determinar quais estão disponíveis para review
-  useEffect(() => {
-    const fetchBookingsAndCheckReviews = async () => {
-      try {
-        setLoadingBookings(true);
-        const bookingsResponse = await api.get("/bookings/my-bookings");
-        const bookings = bookingsResponse.data.data.data || [];
+  const fetchBookingsAndCheckReviews = async (reviews = []) => {
+    try {
+      setLoadingBookings(true);
+      const bookingsResponse = await api.get("/bookings/my-bookings");
+      const bookings = bookingsResponse?.data?.data?.data || [];
 
-        const now = new Date();
-        const available = [];
+      const now = new Date();
+      const available = [];
 
-        for (const booking of bookings) {
-          // ✅ Usa a data da tour (startDates[0])
-          const tourStartDate = new Date(booking.tour.startDates?.[0]);
-          const tourDuration = booking.tour.duration || 1;
+      for (const booking of bookings) {
+        const tourStartDate = new Date(booking.tour.startDates?.[0]);
+        const tourDuration = booking.tour.duration || 1;
 
-          // Calcula data final da tour
-          const tourEndDate = new Date(tourStartDate);
-          tourEndDate.setDate(tourEndDate.getDate() + tourDuration);
+        const tourEndDate = new Date(tourStartDate);
+        tourEndDate.setDate(tourEndDate.getDate() + tourDuration);
 
-          // Disponível 24h após o fim da tour
-          const availableFromDate = new Date(tourEndDate);
-          availableFromDate.setDate(availableFromDate.getDate() + 1);
+        const availableFromDate = new Date(tourEndDate);
+        availableFromDate.setDate(availableFromDate.getDate() + 1);
 
-          console.log("🔍 Tour end date:", tourEndDate);
-          console.log("🔍 Available from:", availableFromDate);
-          console.log("🔍 Now:", now);
-          console.log("🔍 Can review?", now >= availableFromDate);
+        if (now >= availableFromDate) {
+          // comparar por tour id (string)
+          const bookingTourId =
+            (booking.tour && (booking.tour._id || booking.tour)) || null;
 
-          // Verifica se já passaram 24h do fim da tour
-          if (now >= availableFromDate) {
-            // Verifica se já tem review para este tour
-            const hasReview = myReviews.some(
-              (review) => review.tour._id === booking.tour._id,
-            );
+          const hasReview = reviews.some((review) => {
+            const reviewTourId =
+              (review.tour && (review.tour._id || review.tour)) || null;
+            return String(reviewTourId) === String(bookingTourId);
+          });
 
-            if (!hasReview) {
-              available.push({
-                ...booking,
-                canReview: true,
-                tourEndDate,
-              });
-            }
+          if (!hasReview) {
+            available.push({
+              ...booking,
+              canReview: true,
+              tourEndDate,
+            });
           }
         }
-
-        console.log("🔍 Disponíveis para review:", available);
-        setAvailableForReview(available);
-      } catch (err) {
-        console.error("🔍 Erro ao buscar bookings:", err);
-      } finally {
-        setLoadingBookings(false);
       }
-    };
 
-    if (myReviews.length >= 0) {
-      fetchBookingsAndCheckReviews();
+      setAvailableForReview(available);
+    } catch (err) {
+      console.error("Erro ao buscar bookings:", err);
+      setAvailableForReview([]);
+    } finally {
+      setLoadingBookings(false);
     }
+  };
+
+  // recalcula disponíveis sempre que minhas reviews mudam (mantém sincronizado)
+  useEffect(() => {
+    fetchBookingsAndCheckReviews(myReviews);
   }, [myReviews]);
 
   // Submeter review
-const handleSubmitReview = async (tourId) => {
-  if (!formData.review.trim() || formData.rating < 1 || formData.rating > 5) {
-    alert("Por favor, preencha todos os campos correctamente");
-    return;
-  }
-
-  try {
-    setSubmitting(true);
-    // para usar tourId na rota (se existir) ou envia no body
-    const response = await api.post("/reviews", {
-      tour: tourId,
-      rating: parseInt(formData.rating),
-      review: formData.review,
-    });
-
-    console.log("🔍 Review criada com sucesso:", response.data.data.data);
-    // resto...
-  } catch (err) {
-    console.error("🔍 Erro ao criar review:", err.response?.data || err);
-    alert(
-      "Erro ao criar review: " + (err.response?.data?.message || err.message),
-    );
-  } finally {
-    setSubmitting(false);
-  }
-};
-
-  const handleUpdateReview = async (reviewId, tourId) => {
+  const handleSubmitReview = async (tourId) => {
     if (!formData.review.trim() || formData.rating < 1 || formData.rating > 5) {
-      alert("Por favor, preencha todos os campos correctamente");
+      alert("Por favor, preencha todos os campos corretamente");
       return;
     }
 
     try {
       setSubmitting(true);
-      const response = await api.patch(`/reviews/${reviewId}`, {
-        rating: parseInt(formData.rating),
+      await api.post("/reviews", {
+        tour: tourId,
+        rating: parseInt(formData.rating, 10),
         review: formData.review,
       });
 
-      console.log("🔍 Review atualizada com sucesso:", response.data.data.data);
+      // em vez de fazer manipulações locais arriscadas, recarrego as listas do servidor
+      const reviews = await fetchMyReviews();
+      await fetchBookingsAndCheckReviews(reviews);
 
-      // Atualiza a lista de reviews
-      setMyReviews(
-        myReviews.map((r) =>
-          r._id === reviewId ? response.data.data.data : r,
-        ),
+      setFormData({ rating: 5, review: "" });
+      setExpandedForm(null);
+      alert("Review enviada com sucesso!");
+    } catch (err) {
+      console.error("Erro ao criar review:", err.response?.data || err);
+      alert(
+        "Erro ao criar review: " + (err.response?.data?.message || err.message),
       );
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
-      // Limpa o formulário
+  const handleUpdateReview = async (reviewId, tourId) => {
+    if (!formData.review.trim() || formData.rating < 1 || formData.rating > 5) {
+      alert("Por favor, preencha todos os campos corretamente");
+      return;
+    }
+
+    try {
+      setSubmitting(true);
+      await api.patch(`/reviews/${reviewId}`, {
+        rating: parseInt(formData.rating, 10),
+        review: formData.review,
+      });
+
+      // refresca listas após update
+      const reviews = await fetchMyReviews();
+      await fetchBookingsAndCheckReviews(reviews);
+
       setFormData({ rating: 5, review: "" });
       setExpandedForm(null);
     } catch (err) {
-      console.error("🔍 Erro ao atualizar review:", err);
+      console.error("Erro ao atualizar review:", err);
       alert("Erro ao atualizar review");
     } finally {
       setSubmitting(false);
@@ -157,12 +152,10 @@ const handleSubmitReview = async (tourId) => {
 
     try {
       await api.delete(`/reviews/${reviewId}`);
-      console.log("🔍 Review apagada com sucesso");
-
-      // Remove da lista
-      setMyReviews(myReviews.filter((r) => r._id !== reviewId));
+      const reviews = await fetchMyReviews();
+      await fetchBookingsAndCheckReviews(reviews);
     } catch (err) {
-      console.error("🔍 Erro ao apagar review:", err);
+      console.error("Erro ao apagar review:", err);
       alert("Erro ao apagar review");
     }
   };
@@ -176,7 +169,6 @@ const handleSubmitReview = async (tourId) => {
       <h2 className="text-2xl font-bold mb-6">Minhas Reviews</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        {/* COLUNA ESQUERDA - Reviews já feitas */}
         <div>
           <h3 className="text-xl font-bold mb-4">
             Reviews Feitas ({myReviews.length})
@@ -191,7 +183,9 @@ const handleSubmitReview = async (tourId) => {
                   className="border rounded-lg p-4 bg-gray-50"
                 >
                   <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-bold text-lg">{review.tour.name}</h4>
+                    <h4 className="font-bold text-lg">
+                      {review.tour?.name || "—"}
+                    </h4>
                     <div className="flex gap-2">
                       <button
                         onClick={() => {
@@ -223,7 +217,6 @@ const handleSubmitReview = async (tourId) => {
 
                   <p className="text-gray-700">{review.review}</p>
 
-                  {/* Formulário de edição expandível */}
                   {expandedForm === `edit-${review._id}` && (
                     <div className="mt-4 pt-4 border-t space-y-3">
                       <div>
@@ -286,7 +279,6 @@ const handleSubmitReview = async (tourId) => {
           )}
         </div>
 
-        {/* COLUNA DIREITA - Disponíveis para review */}
         <div>
           <h3 className="text-xl font-bold mb-4">
             Disponíveis para Review ({availableForReview.length})
@@ -319,7 +311,6 @@ const handleSubmitReview = async (tourId) => {
                     )}
                   </p>
 
-                  {/* Formulário expandível */}
                   {expandedForm === `new-${booking._id}` ? (
                     <div className="space-y-3 bg-white p-3 rounded border">
                       <div>

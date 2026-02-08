@@ -8,7 +8,6 @@ const sendEmail = require('./../utils/email');
 const Email = require('./../utils/email');
 
 const signToken = (id) => {
-  console.log('JWT_EXPIRES_IN:', process.env.JWT_EXPIRES_IN);
   return jwt.sign({ id }, process.env.JWT_SECRET, {
     expiresIn: process.env.JWT_EXPIRES_IN,
   }); //in mongo the id is _id )
@@ -74,7 +73,7 @@ exports.login = catchAsync(async (req, res, next) => {
     return next(new AppError('Incorrect email or passord', 401));
   }
 
-  console.log(user);
+
 
   //if ok, send token
   createSendToken(user, 200, res);
@@ -88,12 +87,9 @@ exports.protect = catchAsync(async (req, res, next) => {
     req.headers.authorization.startsWith('Bearer')
   ) {
     token = req.headers.authorization.split(' ')[1];
-    console.log('Token from header', token);
   } else if (req.cookies.jwt) {
     token = req.cookies.jwt;
-    console.log('Token from cookies:', token);
   }
-  console.log('final token', token);
 
   if (!token) {
     return next(
@@ -102,7 +98,7 @@ exports.protect = catchAsync(async (req, res, next) => {
   }
   // 2) Verification the token
   const decoded = await promisify(jwt.verify)(token, process.env.JWT_SECRET);
-  //console.log(decoded);
+  
 
   // 3) Check if user still exists
   const currentUser = await User.findById(decoded.id);
@@ -129,8 +125,7 @@ exports.protect = catchAsync(async (req, res, next) => {
 
 exports.restrictTo = (...roles) => {
   return (req, res, next) => {
-    // console.log('Checking role:', req.user.role);
-    // console.log('Allowed roles:', roles);
+    
     //roles is an array ['admin' , 'lead-guide'] role='user'
     if (!roles.includes(req.user.role)) {
       return next(

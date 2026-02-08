@@ -29,7 +29,6 @@ const TripBuddyPresentation = () => {
     if (!video) return;
 
     const handleVideoEnd = () => {
-      console.log("Video ended, starting smooth transition");
 
       // Inicia fade out suave
       setFadeOut(true);
@@ -43,7 +42,6 @@ const TripBuddyPresentation = () => {
         setTimeout(() => {
           setCurrentVideoIndex((prevIndex) => {
             const next = (prevIndex + 1) % videos.length;
-            console.log("Changing from video", prevIndex, "to", next);
             return next;
           });
           setFadeOut(false);
@@ -53,7 +51,6 @@ const TripBuddyPresentation = () => {
     };
 
     const handleCanPlay = () => {
-      console.log("Video can play - setting loaded to true");
       setIsVideoLoaded(true);
     };
 
@@ -64,7 +61,6 @@ const TripBuddyPresentation = () => {
     };
 
     const handlePlay = () => {
-      console.log("Video started playing");
       setIsVideoLoaded(true);
     };
 
@@ -86,7 +82,7 @@ const TripBuddyPresentation = () => {
     const video = videoRef.current;
     if (!video || isTransitioning) return;
 
-    console.log("Loading video:", videos[currentVideoIndex]?.src);
+    
     setIsVideoLoaded(false);
 
     video.pause();
@@ -102,7 +98,6 @@ const TripBuddyPresentation = () => {
       try {
         await new Promise((resolve) => setTimeout(resolve, 200));
         await video.play();
-        console.log("Video playing successfully");
         setIsVideoLoaded(true);
       } catch (error) {
         console.error("Error playing video:", error);
@@ -151,11 +146,9 @@ const TripBuddyPresentation = () => {
                 setIsVideoLoaded(false);
               }}
               onLoadStart={() => {
-                console.log("Video load started");
                 setIsVideoLoaded(false);
               }}
               onCanPlay={() => {
-                console.log("Video can play (onCanPlay)");
                 setIsVideoLoaded(true);
               }}
             >

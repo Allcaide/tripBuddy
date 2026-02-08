@@ -17,12 +17,12 @@ mongoose
     // opcional: dbName se não estiver explícito na connection string
     dbName: 'tripbuddy',
   })
-  .then(() => console.log('DB connection successful'))
+  .then(() => console.info('DB connection successful'))
   .catch((err) => {
     console.error('DB connection error:', err.message);
     process.exit(1);
   });
-// console.log(process.env); //checking the environment, if it is development or production
+// environment variables are intentionally not logged
 
 const tours = JSON.parse(fs.readFileSync(`${__dirname}/tours.json`, 'utf-8'));
 const users = JSON.parse(fs.readFileSync(`${__dirname}/users.json`, 'utf-8'));
@@ -30,16 +30,16 @@ const reviews = JSON.parse(
   fs.readFileSync(`${__dirname}/reviews.json`, 'utf-8')
 );
 
-//console.log('Tours lidos:', tours);
+// tours loaded from file above
 //IMPORT DATA INTO DATABASE
 const importData = async () => {
   try {
     await Tour.create(tours);
     await User.create(users, { validateBeforeSave: false });
     await Review.create(reviews);
-    console.log('Data successfully loaded!');
+    console.info('Data successfully loaded!');
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
@@ -49,17 +49,17 @@ const deleteData = async () => {
     await Tour.deleteMany();
     await User.deleteMany();
     await Review.deleteMany();
-    console.log('Data successfully deleted!');
+    console.info('Data successfully deleted!');
     process.exit();
   } catch (err) {
-    console.log(err);
+    console.error(err);
   }
 };
 
 if (process.argv[2] === '--import') {
   importData()
     .then(() => {
-      console.log('Import finished, exiting.');
+      console.info('Import finished, exiting.');
       process.exit();
     })
     .catch((err) => {
@@ -69,7 +69,7 @@ if (process.argv[2] === '--import') {
 } else if (process.argv[2] === '--delete') {
   deleteData()
     .then(() => {
-      console.log('Delete finished, exiting.');
+      console.info('Delete finished, exiting.');
       process.exit();
     })
     .catch((err) => {
@@ -78,4 +78,4 @@ if (process.argv[2] === '--import') {
     });
 }
 
-console.log(process.argv);
+// process.argv intentionally left out of logs

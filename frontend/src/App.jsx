@@ -11,7 +11,6 @@ const App = () => {
     const token = localStorage.getItem("token");
     if (token) {
       setAuthToken(token);
-      console.log("Token loaded from localStorage on app start");
     }
   }, []);
 

@@ -30,7 +30,6 @@ const Navbar = () => {
 
   // ATUALIZAR handleAuthSuccess para refresh
   const handleAuthSuccess = (response) => {
-    console.log("Auth success response:", response);
     setUser(response.data.user);
 
     // REFRESH DA PÁGINA APÓS LOGIN BEM SUCEDIDO
@@ -41,10 +40,9 @@ const Navbar = () => {
 
   const handleLogout = async () => {
     try {
-      console.log("🚀 Logging out...");
       await authService.logout();
       setUser(null);
-      console.log("✅ Logout completed successfully");
+      
       window.location.href = "/";
     } catch (error) {
       console.error("🚨 Logout error:", error);

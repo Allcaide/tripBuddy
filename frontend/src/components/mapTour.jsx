@@ -32,7 +32,7 @@ const TourMap = ({ tour }) => {
     );
   }
 
-  console.log("Tour start location:", tour.startLocation);
+  
 
   // Coordenadas: [longitude, latitude] -> [latitude, longitude] para Leaflet
   const center = [
