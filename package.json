@@ -1,11 +1,12 @@
 {
-  "dependencies": {
-    "cookie-parser": "^1.4.7",
-    "cors": "^2.8.5",
-    "multer": "^2.0.2"
-  }
+    "name": "tripbuddy",
+    "version": "1.0.0",
+    "private": true,
+    "engines": {
+        "node": "18.x"
+    },
     "scripts": {
-    "start": "node backend/server.js",
-    "heroku-postbuild": "cd frontend && npm install --legacy-peer-deps && npm run build && cd ../backend && npm install --production"
-  }
+        "start": "node backend/server.js",
+        "heroku-postbuild": "cd frontend && npm install --legacy-peer-deps && npm run build && cd ../backend && npm install --production"
+    }
 }
