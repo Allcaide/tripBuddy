@@ -141,6 +141,7 @@ app.use(
         scriptSrc: ["'self'", 'https://js.stripe.com'],
         scriptSrcAttr: ["'none'"],
         styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+        frameSrc: ["'self'", 'https://js.stripe.com'],
         connectSrc: Array.from(cspConnectSrc),
         upgradeInsecureRequests: [],
       },
@@ -196,6 +197,14 @@ app.use('/api/v1/bookings', bookingRouter);
 app.use('/api/v1/tours', tourRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+
+// Also mount routes without the version prefix to support older frontend builds
+// that call `/api/...` (some builds used `/api/tours` etc.). This is safe
+// and provides backward compatibility while we standardize on `/api/v1`.
+app.use('/api/bookings', bookingRouter);
+app.use('/api/tours', tourRouter);
+app.use('/api/users', userRouter);
+app.use('/api/reviews', reviewRouter);
 
 // Serve frontend build if present inside the container or sibling folder.
 const possibleDistPaths = [
