@@ -1,12 +1,12 @@
 {
-    "name": "tripbuddy",
-    "version": "1.0.0",
-    "private": true,
-    "engines": {
-        "node": "18.x"
-    },
-    "scripts": {
-        "start": "node backend/server.js",
-        "heroku-postbuild": "cd frontend && npm install --legacy-peer-deps && npm run build && cd ../backend && npm install --production"
-    }
+  "name": "tripbuddy",
+  "version": "1.0.0",
+  "private": true,
+  "engines": {
+    "node": "18.x"
+  },
+  "scripts": {
+    "start": "node backend/server.js",
+    "heroku-postbuild": "cd frontend && NPM_CONFIG_PRODUCTION=false npm install --legacy-peer-deps && npm run build && cd ../backend && npm install --production"
+  }
 }
