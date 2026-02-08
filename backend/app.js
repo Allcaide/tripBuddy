@@ -96,10 +96,55 @@ app.use(
 );
 
 // Set Security http headers (DEPOIS das imagens!)
+// Configure Helmet with a restrictive but functional Content Security Policy.
+// Allow `connect-src` to the same origin and to the configured API/frontend host
+// (useful when the built frontend embeds an absolute API URL). Also allow
+// Stripe script and common asset origins used by Vite/third-party libs.
+const cspConnectSrc = new Set(["'self'"]);
+try {
+  if (process.env.VITE_API_BASE_URL) {
+    // VITE_API_BASE_URL may include a path like https://app.example.com/api
+    const tmp = new URL(process.env.VITE_API_BASE_URL);
+    cspConnectSrc.add(tmp.origin);
+  }
+} catch (e) {
+  // ignore parse errors
+}
+if (process.env.FRONTEND_URL) {
+  process.env.FRONTEND_URL.split(',').map(s => s.trim()).filter(Boolean).forEach(u => {
+    try {
+      const tmp = new URL(u);
+      cspConnectSrc.add(tmp.origin);
+    } catch (e) {
+      // if it's just a host without scheme, add as-is
+      cspConnectSrc.add(u);
+    }
+  });
+}
+
+// Add Stripe and localhost dev endpoints just in case
+cspConnectSrc.add('https://js.stripe.com');
+cspConnectSrc.add('http://localhost:5173');
+
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
     crossOriginEmbedderPolicy: false,
+    contentSecurityPolicy: {
+      useDefaults: false,
+      directives: {
+        defaultSrc: ["'self'"],
+        baseUri: ["'self'"],
+        fontSrc: ["'self'", 'https:', 'data:'],
+        imgSrc: ["'self'", 'data:'],
+        objectSrc: ["'none'"],
+        scriptSrc: ["'self'", 'https://js.stripe.com'],
+        scriptSrcAttr: ["'none'"],
+        styleSrc: ["'self'", 'https:', "'unsafe-inline'"],
+        connectSrc: Array.from(cspConnectSrc),
+        upgradeInsecureRequests: [],
+      },
+    },
   }),
 );
 
