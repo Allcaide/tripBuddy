@@ -6,7 +6,7 @@
   "type": "commonjs",
   "scripts": {
     "dev": "nodemon server.js",
-    "start": "nodemon --no-deprecation server.js",
+    "start": "node server.js",
     "start:prod": "cross-env NODE_ENV=production node server.js",
     "debug": "ndb server.js"
   },

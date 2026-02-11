@@ -27,7 +27,13 @@ mongoose
   .then(() => console.info('DB connection successful'));
 
 // environment variables are intentionally not logged
+const path = require('path');
 
+// servir frontend estático
+app.use(express.static(path.join(__dirname, '../frontend/dist')));
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
+});
 const port = process.env.PORT || 3000;
 const server = app.listen(port, '0.0.0.0', () => {
     const localUrl = `http://127.0.0.1:${port}`;

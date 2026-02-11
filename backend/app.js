@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
-const tourRouter = require('./routes/tourRoutes');
+const tourRouter = require('./routes/productRoutes');
 const userRouter = require('./routes/usersRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
@@ -20,66 +20,6 @@ const compression = require('compression');
 
 const app = express();
 
-// Trust proxy when running behind Heroku (needed for secure cookies)
-if (process.env.NODE_ENV === 'production') {
-  app.set('trust proxy', 1);
-}
-
-// 🎯 CORS Configuration - MUITO IMPORTANTE!
-// Support a comma-separated FRONTEND_URL env value and also accept localhost/127.0.0.1 variations
-const defaultAllowed = [
-  'http://localhost:5173', // Vite dev server
-  'http://localhost:3000', // React dev server
-  'http://127.0.0.1:5173',
-  'http://127.0.0.1:3000',
-];
-
-let allowedOrigins = defaultAllowed;
-if (process.env.FRONTEND_URL) {
-  const raw = process.env.FRONTEND_URL.split(',').map((s) => s.trim()).filter(Boolean);
-  // add equivalents for localhost <-> 127.0.0.1
-  const expanded = new Set();
-  raw.forEach((u) => {
-    expanded.add(u);
-    if (u.includes('localhost')) expanded.add(u.replace('localhost', '127.0.0.1'));
-    if (u.includes('127.0.0.1')) expanded.add(u.replace('127.0.0.1', 'localhost'));
-  });
-  allowedOrigins = Array.from(expanded);
-}
-
-const corsOptions = {
-  origin: (origin, callback) => {
-    // allow non-browser (postman, curl) requests with no origin
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    return callback(new Error('Not allowed by CORS'), false);
-  },
-
-  credentials: true,
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'PATCH', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  // IMPORTANTE: Permite headers customizados para imagens
-  exposedHeaders: ['Content-Type', 'Content-Length'],
-};
-
-// Apply CORS middleware - SÓ UMA VEZ!
-app.use(cors(corsOptions));
-
-// NOTE: static frontend serving is handled once, after API routes below.
-// The previous implementation had multiple, duplicated handlers and an
-// unconditional catch-all that caused incorrect behavior when the
-// `frontend/dist` directory didn't exist or was in a different path.
-
-// Handle preflight requests
-app.options('*', cors(corsOptions));
-
-app.use(compression());
-
-// Webhook endpoint deve estar ANTES do body parser, senão o Stripe não consegue verificar a assinatura
-app.post('/api/v1/bookings/webhook-checkout', 
-  express.raw({type: 'application/json'}), 
-  require('./controllers/bookingController').webhookCheckout
-);
 
 
 // 📸 SERVIR IMAGENS ESTÁTICAS - ANTES DE TUDO!
@@ -110,21 +50,7 @@ try {
 } catch (e) {
   // ignore parse errors
 }
-if (process.env.FRONTEND_URL) {
-  process.env.FRONTEND_URL.split(',').map(s => s.trim()).filter(Boolean).forEach(u => {
-    try {
-      const tmp = new URL(u);
-      cspConnectSrc.add(tmp.origin);
-    } catch (e) {
-      // if it's just a host without scheme, add as-is
-      cspConnectSrc.add(u);
-    }
-  });
-}
 
-// Add Stripe and localhost dev endpoints just in case
-cspConnectSrc.add('https://js.stripe.com');
-cspConnectSrc.add('http://localhost:5173');
 
 app.use(
   helmet({
@@ -206,19 +132,8 @@ app.use('/api/tours', tourRouter);
 app.use('/api/users', userRouter);
 app.use('/api/reviews', reviewRouter);
 
-// Serve frontend build if present inside the container or sibling folder.
-const possibleDistPaths = [
-  path.join(__dirname, 'frontend', 'dist'),
-  path.join(__dirname, '..', 'frontend', 'dist'),
-  path.join(__dirname, '../frontend/dist'),
-];
-let builtFrontendPath = possibleDistPaths.find((p) => fs.existsSync(p));
-if (builtFrontendPath) {
-  app.use(express.static(builtFrontendPath));
-  app.get(/^\/(?!api).*/, (req, res) => {
-    res.sendFile(path.join(builtFrontendPath, 'index.html'));
-  });
-}
+
+
 
 app.all('*', (req, res, next) => {
   next(new AppError(`Can't find ${req.originalUrl} on this server!`, 404));

@@ -2,7 +2,7 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
-const Tour = require('./tourModels');
+const Tour = require('./productModels');
 const User = require('./userModel');
 
 const reviewSchema = new mongoose.Schema(
