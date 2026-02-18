@@ -24,7 +24,7 @@ const PasswordResetEmail = ({ firstName, url }) => {
         React.createElement(
           Section,
           { style: headerStyle },
-          React.createElement(Text, { style: logoStyle }, '🌍 tripBuddy'),
+          React.createElement(Text, { style: logoStyle }, '🧵 MilFios'),
         ),
         React.createElement(
           Section,

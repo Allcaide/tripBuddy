@@ -28,7 +28,7 @@ exports.updateOne = (
     res.status(200).json({
       status: 'success',
       data: {
-        data: doc, // Return the actual updated tour data
+        data: doc,
       },
     });
   });
@@ -61,25 +61,21 @@ exports.getOne = (Model, popOptions) =>
     });
   });
 
-exports.getAll = (Model) =>
+exports.getAll = (Model, popOptions) =>
   catchAsync(async (req, res, next) => {
-    //To allow for nested GET reivews on tour(hack)
+    // Allow nested GET reviews on product
     let filter = {};
-    if (req.params.tourId) filter = { tour: req.params.tourId };
+    if (req.params.productId) filter = { product: req.params.productId };
     const features = new APIFeatures(Model.find(filter), req.query)
       .filter()
       .sort()
       .limitFields()
       .paginate();
-    let doc = await features.query.populate('reviews');
 
-    // Adiciona o número de reviews em cada tour
-    doc = doc.map((tour) => {
-      const tourObj = tour.toObject();
-      tourObj.reviewsCount = tourObj.reviews ? tourObj.reviews.length : 0;
-      delete tourObj.reviews; // Remove o array de reviews, se não quiser mostrar
-      return tourObj;
-    });
+    let query = features.query;
+    if (popOptions) query = query.populate(popOptions);
+
+    const doc = await query;
 
     res.status(200).json({
       status: 'success',

@@ -1,73 +1,49 @@
 const express = require('express');
-const tourController = require('../controllers/productController');
+const productController = require('../controllers/productController');
 const authController = require('../controllers/authController');
 const reviewRouter = require('./reviewRoutes');
 
 const router = express.Router();
 
-//POST TOUR/SLADKFB2134/ REVIEWS
-//GET TOUR/SLADKFB2134/ REVIEWS
-//GET TOUR/SLADKFB2134/ REVIEWS/SADBSADG546
+// Nested reviews: POST /products/:productId/reviews
+router.use('/:productId/reviews', reviewRouter);
 
-// router
-//   .route('/:tourId/reviews')
-//   .post(
-//     authController.protect,
-//     authController.restrictTo('user'),
-//     reviewController.createReview
-//   );
+// ───────── Rotas públicas ─────────
 
-// router.param('id', tourController.checkID); // Middleware to check ID
+// Valores distintos para dropdowns (categorias, cores, tamanhos, etc.)
+router.get('/field-options', productController.getFieldOptions);
 
-// router.param('body', tourController.checkBody); // Middleware to check body
+// Buscar produto por slug (para páginas de detalhe com URL amigável)
+router.get('/slug/:slug', productController.getProduct);
 
-router.use('/:tourId/reviews', reviewRouter);
+// Listar todos / ver um produto — público
+router
+  .route('/')
+  .get(productController.getAllProducts);
 
 router
-  .route('/top-5-cheap')
-  .get(tourController.aliasTopTours, tourController.getAllTours);
+  .route('/:id')
+  .get(productController.getProduct);
 
-router.route('/tour-stats').get(tourController.getTourStats);
-router
-  .route('/monthly-plan/:year')
-  .get(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide', 'guide'),
-    tourController.getMonthStats,
-  );
-
-router
-  .route('/tours-within/:distance/center/:latlng/unit/:unit')
-
-  .get(tourController.getToursWithin);
-//tours-within?distance=223,&center=-40,45&unit=mi
-// tours-within/233/center/-40.45/unit/mi
-
-router.route('/distances/:latlng/unit/:unit').get(tourController.getDistances);
+// ───────── Rotas protegidas (admin) ─────────
+router.use(authController.protect);
+router.use(authController.restrictTo('admin'));
 
 router
   .route('/')
-  .get(tourController.getAllTours)
   .post(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
-    tourController.addNewTour,
-  );
-router
-  .route('/:id')
-  .get(tourController.getTour)
-  .patch(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
-    tourController.uploadTourImages,
-    tourController.resizeTourImages,
-    tourController.updateTour,
-  )
-  .delete(
-    authController.protect,
-    authController.restrictTo('admin', 'lead-guide'),
-    tourController.deleteTour,
+    productController.uploadProductImages,
+    productController.resizeProductImages,
+    productController.addNewProduct,
   );
 
-router.get('/slug/:slug', tourController.getTourBySlug);
+router
+  .route('/:id')
+  .patch(
+    productController.uploadProductImages,
+    productController.resizeProductImages,
+    productController.updateProduct,
+  )
+  .delete(productController.deleteProduct);
+
 module.exports = router;

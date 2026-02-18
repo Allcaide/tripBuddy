@@ -1,20 +1,10 @@
 const multer = require('multer');
-const User = require('./../Models/userModel'); // Importing the Tour model
+const User = require('./../Models/userModel');
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
 const sharp = require('sharp');
 
-// const multerStorage = multer.diskStorage({
-//   destination: (req, file, cb) => {
-//     //cb is for callback
-//     cb(null, 'public/img/users');
-//   },
-//   filename: (req, file, cb) => {
-//     const ext = file.mimetype.split('/')[1];
-//     cb(null, `user-${req.user.id}-${Date.now()}.${ext}`);
-//   },
-// });
 
 const multerStorage = multer.memoryStorage();
 

@@ -11,7 +11,7 @@ const cookieParser = require('cookie-parser');
 const fs = require('fs');
 const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
-const tourRouter = require('./routes/productRoutes');
+const productRouter = require('./routes/productRoutes');
 const userRouter = require('./routes/usersRoutes');
 const bookingRouter = require('./routes/bookingRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
@@ -120,15 +120,13 @@ app.use((req, res, next) => {
 
 // 3) Routes
 app.use('/api/v1/bookings', bookingRouter);
-app.use('/api/v1/tours', tourRouter);
+app.use('/api/v1/products', productRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
 
-// Also mount routes without the version prefix to support older frontend builds
-// that call `/api/...` (some builds used `/api/tours` etc.). This is safe
-// and provides backward compatibility while we standardize on `/api/v1`.
+// Backward compatibility
 app.use('/api/bookings', bookingRouter);
-app.use('/api/tours', tourRouter);
+app.use('/api/products', productRouter);
 app.use('/api/users', userRouter);
 app.use('/api/reviews', reviewRouter);
 

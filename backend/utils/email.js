@@ -62,7 +62,7 @@ module.exports = class Email {
   }
 
   async sendWelcome() {
-    await this.send(WelcomeEmail, 'Welcome to the tripBuddy Family! 🌍');
+    await this.send(WelcomeEmail, 'Bem-vindo à família MilFios! 🧵');
   }
 
   async sendPasswordReset() {

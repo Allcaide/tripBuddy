@@ -13,27 +13,28 @@ const app = require('./app'); //importing the app from app.js
 
 const DB = process.env.DATABASE.replace(
   '<PASSWORD>',
-  process.env.DATABASE_PASSWORD
-); //replacing the <PASSWORD> in the DATABASE string with the actual password from the environment variable
+  encodeURIComponent(process.env.DATABASE_PASSWORD),
+);
 
 mongoose
   .connect(DB, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true,
-    useCreateIndex: true,
-    useFindAndModify: false,
-    dbName: 'tripbuddy',
+    dbName: 'milfios',
   })
   .then(() => console.info('DB connection successful'));
 
 // environment variables are intentionally not logged
 const path = require('path');
+const express = require('express');
 
-// servir frontend estático
-app.use(express.static(path.join(__dirname, '../frontend/dist')));
-app.get('*', (req, res) => {
-  res.sendFile(path.join(__dirname, '../frontend/dist', 'index.html'));
-});
+// servir frontend estático (só se a pasta existir)
+const frontendPath = path.join(__dirname, '../frontend/dist');
+const fs = require('fs');
+if (fs.existsSync(frontendPath)) {
+  app.use(express.static(frontendPath));
+  app.get('*', (req, res) => {
+    res.sendFile(path.join(frontendPath, 'index.html'));
+  });
+}
 const port = process.env.PORT || 3000;
 const server = app.listen(port, '0.0.0.0', () => {
     const localUrl = `http://127.0.0.1:${port}`;

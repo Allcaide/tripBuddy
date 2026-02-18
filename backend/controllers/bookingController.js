@@ -1,51 +1,60 @@
-const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
-const Tour = require('../Models/productModels');
+const Stripe = require('stripe');
+const Product = require('../Models/productModels');
 const Booking = require('./../Models/bookingModel');
 const catchAsync = require('./../utils/catchAsync');
 const AppError = require('./../utils/appError');
+
+// Lazy init — garante que STRIPE_SECRET_KEY já foi carregada pelo dotenv
+let stripe;
+const getStripe = () => {
+  if (!stripe) {
+    stripe = Stripe(process.env.STRIPE_SECRET_KEY);
+  }
+  return stripe;
+};
 const factory = require('./handlerFactory');
 const APIFeatures = require('./../utils/apiFeatures');
 
 // Função auxiliar para criar booking
-const createBooking = async (tourId, userId, price) => {
-  return await Booking.create({ tour: tourId, user: userId, price });
+const createBooking = async (productId, userId, price) => {
+  return await Booking.create({ product: productId, user: userId, price });
 };
 
 exports.getCheckoutSession = catchAsync(async (req, res, next) => {
   // 1) Get the currently booked tour
-  const tour = await Tour.findById(req.params.tourId);
+  const product = await Product.findById(req.params.productId);
 
-  if (!tour) {
-    return next(new AppError('No tour found with that ID', 404));
+  if (!product) {
+    return next(new AppError('No product found with that ID', 404));
   }
 
   // 2) Create checkout session
-  const session = await stripe.checkout.sessions.create({
+  const session = await getStripe().checkout.sessions.create({
     payment_method_types: ['card'],
-    success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/tours`,
-    cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/tours/${tour.slug}`,
+    success_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/products`,
+    cancel_url: `${process.env.FRONTEND_URL || 'http://localhost:5173'}/products/${product.slug}`,
     customer_email: req.user.email,
-    client_reference_id: req.params.tourId,
+    client_reference_id: req.params.productId,
     mode: 'payment',
     line_items: [
       {
         price_data: {
           currency: 'eur',
-          unit_amount: tour.price * 100,
+          unit_amount: product.price * 100,
           product_data: {
-            name: `${tour.name} Tour`,
-            description: tour.summary,
+            name: product.name,
+            description: product.summary,
             images: [
-              `${req.protocol}://${req.get('host')}/img/tours/${tour.imageCover}`,
+              `${req.protocol}://${req.get('host')}/img/products/${product.imageCover}`,
             ],
           },
         },
         quantity: 1,
       },
     ],
-    // ✅ IMPORTANTE: Metadata (dados que passamos para o webhook)
+    // Metadata (dados que passamos para o webhook)
     metadata: {
-      tourId: tour._id.toString(),
+      productId: product._id.toString(),
       userId: req.user._id.toString(),
     },
   });
@@ -65,7 +74,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
 
   try {
     // Verifica a assinatura (confirma que veio do Stripe)
-    event = stripe.webhooks.constructEvent(
+    event = getStripe().webhooks.constructEvent(
       req.body,
       sig,
       process.env.STRIPE_WEBHOOK_SECRET,
@@ -80,7 +89,7 @@ exports.webhookCheckout = catchAsync(async (req, res, next) => {
 
     // SEGURO: Criar booking com dados verificados pelo Stripe
     const booking = await createBooking(
-      session.metadata.tourId,
+      session.metadata.productId,
       session.metadata.userId,
       session.amount_total / 100,
     );

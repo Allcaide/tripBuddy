@@ -6,8 +6,8 @@ const factory = require('./handlerFactory');
 
 exports.getAllReviews = factory.getAll(Review);
 
-exports.setTourUserIds = (req, res, next) => {
-  if (!req.body.tour) req.body.tour = req.params.tourId;
+exports.setProductUserIds = (req, res, next) => {
+  if (!req.body.product) req.body.product = req.params.productId;
   if (!req.body.user) req.body.user = req.user.id;
   next();
 };
@@ -18,7 +18,7 @@ exports.deleteReview = factory.deleteOne(Review);
 
 exports.getMyReviews = catchAsync(async (req, res, next) => {
   const reviews = await Review.find({ user: req.user.id })
-    .populate('tour')
+    .populate('product')
     .populate('user');
 
   res.status(200).json({

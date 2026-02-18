@@ -26,7 +26,7 @@ const WelcomeEmail = ({ firstName, url }) => {
         React.createElement(
           Section,
           { style: headerStyle },
-          React.createElement(Text, { style: logoStyle }, '🌍 tripBuddy'),
+          React.createElement(Text, { style: logoStyle }, '🧵 MilFios'),
         ),
         React.createElement(
           Section,
@@ -34,7 +34,7 @@ const WelcomeEmail = ({ firstName, url }) => {
           React.createElement(
             Text,
             { style: titleStyle },
-            `Welcome to tripBuddy, ${firstName}! 🎉`,
+            `Bem-vindo à MilFios, ${firstName}! 🎉`,
           ),
           React.createElement(
             Text,
@@ -62,7 +62,7 @@ const WelcomeEmail = ({ firstName, url }) => {
             { style: footerStyle },
             'Happy traveling! ✈️',
             React.createElement('br', null),
-            'The tripBuddy Team',
+            'A equipa MilFios',
           ),
         ),
       ),

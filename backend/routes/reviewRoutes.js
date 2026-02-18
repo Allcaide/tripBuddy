@@ -3,9 +3,9 @@ const reviewController = require('./../controllers/reviewController');
 const authController = require('./../controllers/authController');
 
 const router = express.Router({ mergeParams: true });
-//POST TOUR/SLADKFB2134/ REVIEWS
-//GET TOUR/SLADKFB2134/ REVIEWS
-//POST /REVIEWS com o merge Params vai sempre parar ao router abaixo. pois vai para o router.use('/:tourId/reviews', reviewRouter); mas é redirecionado paar as reviews
+// POST /products/:productId/reviews
+// GET /products/:productId/reviews
+// POST /reviews
 
 router.use(authController.protect);
 
@@ -14,7 +14,7 @@ router
   .get(reviewController.getAllReviews)
   .post(
     authController.restrictTo('user'),
-    reviewController.setTourUserIds,
+    reviewController.setProductUserIds,
     reviewController.createReview,
   );
 

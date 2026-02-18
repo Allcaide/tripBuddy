@@ -1,153 +1,236 @@
 const mongoose = require('mongoose');
 const slugify = require('slugify');
-const validator = require('validator');
-// const User = require('./userModel');
 
 const productSchema = new mongoose.Schema(
   {
+    // ───────── Identificação ─────────
     name: {
       type: String,
-      required: [true, 'A product must have a name'], //making the name field
-      unique: true, //making the name field unique
-      trim: true, //removing whitespace from the beginning and end of the string
-      maxlength: [40, 'A product name must have less or equal than 40 characters'], //setting a maximum length for the name field
-      minlength: [10, 'A product name must have more or equal than 10 characters'], //setting a minimum length for the name field
-      //validate: [validator.isAlpha, 'The name must only contain characters'],
+      required: [true, 'Um produto precisa de um nome'],
+      unique: true,
+      trim: true,
+      maxlength: [80, 'O nome do produto não pode ter mais de 80 caracteres'],
+      minlength: [3, 'O nome do produto deve ter pelo menos 3 caracteres'],
     },
-    slug: String, //slug field for URL-friendly names
-    secretproduct: {
-      type: Boolean,
-      default: false,
-    },
-    maxGroupSize: {
-      type: Number,
-      required: [true, 'A product must have a group size'], //making the maxGroupSize field required
-    },
-    difficulty: {
+    slug: String,
+    sku: {
       type: String,
-      required: [true, 'A product must have a difficulty level'], //making the difficulty field required
-      enum: {
-        values: ['easy', 'medium', 'difficult'], //defining the possible values for difficulty
-        message: 'Difficulty is either: easy, medium, or difficult',
-      },
+      unique: true,
+      sparse: true, // permite null/undefined sem conflito de unique
+      trim: true,
     },
-    ratingsAverage: {
-      type: Number,
-      default: 4.5, //setting a default value for the rating field
-      min: [1, 'Rating must be above 1.0'],
-      max: [5, 'Rating must be below 5.0'],
-      set: (val) => Math.round(val * 10) / 10,
+
+    // ───────── Categorização ─────────
+    // Sem enum — o admin pode criar categorias novas livremente.
+    // O frontend popula o dropdown com os valores distintos já existentes na DB.
+    category: {
+      type: String,
+      required: [true, 'Um produto precisa de uma categoria'],
+      trim: true,
+      // ex: "Toalhas de Mesa", "Roupa de Cama", "Cortinas"
     },
-    ratingsQuantity: {
-      type: Number,
-      default: 0, //setting a default value for the ratingsQuantity field
+    subcategory: {
+      type: String,
+      trim: true,
+      // ex: "Lençóis", "Fronhas", "Edredões"
     },
+    tags: {
+      type: [String],
+      default: [],
+    },
+
+    // ───────── Detalhes têxtil ─────────
+    material: {
+      type: String,
+      trim: true,
+      // ex: "100% Algodão", "Poliéster/Algodão 50/50"
+    },
+    composition: {
+      type: String,
+      trim: true,
+    },
+    weight: {
+      type: Number, // gramas por m² (GSM) — padrão na indústria têxtil
+      min: [0, 'O peso não pode ser negativo'],
+    },
+    dimensions: {
+      type: [String],
+      default: [],
+      // ex: ["240x260cm", "150x200cm"] — mesmo produto pode ter várias dimensões
+    },
+    colors: {
+      type: [String],
+      default: [],
+      // ex: ["branco", "cinza", "azul-marinho"]
+    },
+    sizes: {
+      type: [String],
+      default: [],
+      // ex: ["solteiro", "casal", "king"] ou ["S", "M", "L"]
+    },
+
+    // ───────── Preços ─────────
     price: {
       type: Number,
-      required: [true, 'A product must have a price'], //making the price field required
+      required: [true, 'Um produto precisa de um preço (consumidor final)'],
+      min: [0, 'O preço não pode ser negativo'],
+    },
+    priceReseller: {
+      type: Number,
+      min: [0, 'O preço de revendedor não pode ser negativo'],
+      // preço especial para users com role "reseller"
     },
     priceDiscount: {
       type: Number,
       validate: {
-        //It will not work on update trips, only in new DOCUMENTS
         validator: function (val) {
-          // 'this' only points to current doc on NEW document creation
+          // Só funciona em criação de documentos novos (this aponta para o doc)
           return val < this.price;
         },
-        message: 'Discount price should be below the trip price',
+        message: 'O preço com desconto deve ser inferior ao preço normal',
       },
     },
+    currency: {
+      type: String,
+      default: 'EUR',
+      enum: ['EUR', 'USD', 'GBP'],
+    },
+
+    // ───────── Stock ─────────
+    stock: {
+      type: Number,
+      required: [true, 'Um produto precisa de quantidade em stock'],
+      min: [0, 'O stock não pode ser negativo'],
+      default: 0,
+    },
+    lowStockThreshold: {
+      type: Number,
+      default: 5, // alerta quando stock <= este valor
+    },
+
+    // ───────── Avaliações ─────────
+    ratingsAverage: {
+      type: Number,
+      default: 0,
+      min: [0, 'A avaliação mínima é 0'],
+      max: [5, 'A avaliação máxima é 5'],
+      set: (val) => Math.round(val * 10) / 10,
+    },
+    ratingsQuantity: {
+      type: Number,
+      default: 0,
+    },
+
+    // ───────── Descrição ─────────
     summary: {
       type: String,
-      trim: true, //removing whitespace from the beginning and end of the string
-      required: [true, 'A product must have a summary'], //making the summary field required
+      trim: true,
+      required: [true, 'Um produto precisa de um resumo'],
     },
     description: {
       type: String,
       trim: true,
     },
+
+    // ───────── Imagens ─────────
     imageCover: {
       type: String,
-      required: [true, 'A product must have a cover image'], //making the imageCover field required
+      required: [true, 'Um produto precisa de uma imagem de capa'],
     },
     images: {
-      type: [String], //array of strings for multiple images
+      type: [String],
     },
+
+    // ───────── Visibilidade ─────────
+    active: {
+      type: Boolean,
+      default: true,
+      // se false, o produto não aparece para compradores
+    },
+    featured: {
+      type: Boolean,
+      default: false,
+      // produtos em destaque na homepage
+    },
+
+    // ───────── Timestamps ─────────
     createdAt: {
       type: Date,
-      default: Date.now, //setting the default value to the current date
+      default: Date.now,
       select: false,
     },
   },
   {
     toJSON: { virtuals: true },
-    toObject: { virtuals: true }, //including virtual properties in JSON and object representations
+    toObject: { virtuals: true },
+    timestamps: true, // adiciona createdAt + updatedAt automáticos
   },
 );
 
-productSchema.index({ price: 1, ratingsAverage: -1 }); //Consumes more memory but it's fast looking for the results
+// ───────── Índices ─────────
+productSchema.index({ price: 1, ratingsAverage: -1 });
 productSchema.index({ slug: 1 });
-productSchema.index({ startLocation: '2dsphere' });
+productSchema.index({ category: 1 });
+productSchema.index({ sku: 1 });
+productSchema.index({ active: 1, featured: -1 });
 
-productSchema.virtual('durationWeeks').get(function () {
-  return this.duration / 7; //creating a virtual property to calculate duration in weeks
+// ───────── Virtuals ─────────
+// Indica se o produto tem stock baixo
+productSchema.virtual('isLowStock').get(function () {
+  return this.stock <= this.lowStockThreshold;
 });
 
-//virtual populate
+productSchema.virtual('inStock').get(function () {
+  return this.stock > 0;
+});
+
+// Virtual populate — reviews ligadas ao produto
 productSchema.virtual('reviews', {
   ref: 'Review',
   foreignField: 'product',
   localField: '_id',
 });
 
-// DOCUMENT MIDDLEWARE runs before .save() and .create()
+// ───────── Document Middleware ─────────
+// Gerar slug a partir do nome antes de guardar
 productSchema.pre('save', function (next) {
-  this.slug = slugify(this.name, { lower: true }); //creating a slug from the name field
-  next(); //calling the next middleware in the stack //If it doesnt call the next middleware function it will hang
+  this.slug = slugify(this.name, { lower: true });
+  next();
 });
 
-// productSchema.pre('save', async function (next) {
-//   const guidesPromises = this.guides.map(async (id) => await User.findById(id));
-//   this.guides = await Promise.all(guidesPromises);
-//   next();
-// });
-
-// productSchema.pre('save', function (next) {
-//   next();
-// });
-
-// productSchema.post('save', function (doc, next) {
-//   next();
-// });
-
-//QueryMiddleWare
+// ───────── Query Middleware ─────────
+// Filtrar produtos inativos automaticamente em qualquer find
 productSchema.pre(/^find/, function (next) {
-  // Desta forma é executado sempre que é feito qualquer comando com find
-  //productSchema.pre('find', function (next) {// estava assim, se fosse assim era executado previamente porque utiliza find, tal como o getAllproducts, se usasse uma função diferente era executado antes do find, que não existiria
-
-  this.find({ secretproduct: { $ne: true } });
-  this.start = Date.now();
+  this.find({ active: { $ne: false } });
   next();
 });
 
-productSchema.pre(/^find/, function (next) {
-  this.populate({
-    path: 'guides',
-    select: '-__v -passwordChangedAt',
-  });
-  next();
-});
+// ───────── Static Methods ─────────
+// Retorna os valores distintos de campos dinâmicos para popular dropdowns no frontend.
+// Uso: const options = await Product.getDistinctFieldValues();
+productSchema.statics.getDistinctFieldValues = async function () {
+  const [categories, subcategories, colors, sizes, dimensions, materials, tags] =
+    await Promise.all([
+      this.distinct('category'),
+      this.distinct('subcategory'),
+      this.distinct('colors'),
+      this.distinct('sizes'),
+      this.distinct('dimensions'),
+      this.distinct('material'),
+      this.distinct('tags'),
+    ]);
 
-productSchema.post(/^find/, function (docs, next) {
-  next();
-});
+  return {
+    categories: categories.filter(Boolean).sort(),
+    subcategories: subcategories.filter(Boolean).sort(),
+    colors: colors.filter(Boolean).sort(),
+    sizes: sizes.filter(Boolean).sort(),
+    dimensions: dimensions.filter(Boolean).sort(),
+    materials: materials.filter(Boolean).sort(),
+    tags: tags.filter(Boolean).sort(),
+  };
+};
 
-//AGGREGATION MIDDLEWARE
-// productSchema.pre('aggregate', function (next) {
-//   this.pipeline().unshift({ $match: { secretproduct: { $ne: true } } });
-//   next();
-// });
+const Product = mongoose.model('Product', productSchema);
 
-const product = mongoose.model('product', productSchema); //creating a model for the product schema
-
-module.exports = product; //exporting the product model so it can be used in other files
+module.exports = Product;

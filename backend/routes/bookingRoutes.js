@@ -21,7 +21,7 @@ router.get(
 router.get('/:id', authController.protect, bookingController.getBooking);
 
 router.get(
-  '/checkout-session/:tourId',
+  '/checkout-session/:productId',
   authController.protect,
   bookingController.getCheckoutSession,
 );

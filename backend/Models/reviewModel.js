@@ -1,8 +1,8 @@
-//review/ rating/ createAt/ reftotour/ ref to user
+//review/ rating/ createAt/ reftoproduct/ ref to user
 const mongoose = require('mongoose');
 const slugify = require('slugify');
 const validator = require('validator');
-const Tour = require('./productModels');
+const Product = require('./productModels');
 const User = require('./userModel');
 
 const reviewSchema = new mongoose.Schema(
@@ -21,14 +21,15 @@ const reviewSchema = new mongoose.Schema(
       default: Date.now,
       select: false,
     },
-    tour: {
+    product: {
       type: mongoose.Schema.ObjectId,
-      ref: 'Tour',
-      required: [true, 'Review must belongo to a tour.'],
+      ref: 'Product',
+      required: [true, 'Review must belong to a product.'],
     },
     user: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
+      required: [true, 'Review must belong to a user.'],
     },
   },
   {
@@ -37,10 +38,10 @@ const reviewSchema = new mongoose.Schema(
   }
 );
 
-reviewSchema.index({ tour: 1, user: 1 }, { unique: true });//User cannot write multiple reviews on the same tour. but it's now roking i dont know why
+reviewSchema.index({ product: 1, user: 1 }, { unique: true });//User cannot write multiple reviews on the same product. but it's now roking i dont know why
 
 reviewSchema.pre(/^find/, function (next) {
-  // this.populate({ path: 'tour', select: 'name' }).populate({
+  // this.populate({ path: 'product', select: 'name' }).populate({
   //   path: 'user',
   //   select: 'name photo',
   // });
@@ -51,14 +52,14 @@ reviewSchema.pre(/^find/, function (next) {
   next();
 });
 
-reviewSchema.statics.calcAverageRatings = async function (tourId) {
+reviewSchema.statics.calcAverageRatings = async function (productId) {
   const stats = await this.aggregate([
     {
-      $match: { tour: tourId },
+      $match: { product: productId },
     },
     {
       $group: {
-        _id: '$tour',
+        _id: '$product',
         nRating: { $sum: 1 },
         avgRating: { $avg: '$rating' },
       },
@@ -67,12 +68,12 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
   
 
   if (stats.length > 0) {
-    await Tour.findByIdAndUpdate(tourId, {
+    await Product.findByIdAndUpdate(productId, {
       ratingsQuantity: stats[0].nRating,
       ratingsAverage: stats[0].avgRating,
     });
   } else {
-    await Tour.findByIdAndUpdate(tourId, {
+    await Product.findByIdAndUpdate(productId, {
       ratingsQuantity: 0,
       ratingsAverage: 0,
     });
@@ -82,7 +83,7 @@ reviewSchema.statics.calcAverageRatings = async function (tourId) {
 reviewSchema.post('save', function () {
   //this points to current review. post bcz only after tyhe doc is saved we can update the function
 
-  this.constructor.calcAverageRatings(this.tour); //this.constructor points to the current model
+  this.constructor.calcAverageRatings(this.product); //this.constructor points to the current model
 });
 
 reviewSchema.pre(/^findOneAnd/, async function (next) {
@@ -91,7 +92,7 @@ reviewSchema.pre(/^findOneAnd/, async function (next) {
   next();
 });
 reviewSchema.post(/^findOneAnd/, async function () {
-  await this.r.constructor.calcAverageRatings(this.r.tour);
+  await this.r.constructor.calcAverageRatings(this.r.product);
 });
 
 const Review = mongoose.model('Review', reviewSchema);
