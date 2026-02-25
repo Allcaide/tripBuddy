@@ -1,0 +1,25 @@
+.breadcrumbs {
+  padding: 16px 40px;
+  font-size: 11px;
+  letter-spacing: 1px;
+  text-transform: uppercase;
+  color: #999;
+}
+
+.breadcrumbs__sep {
+  margin: 0 8px;
+  color: #ccc;
+}
+
+.breadcrumbs__link {
+  color: #999;
+  text-decoration: none;
+}
+
+.breadcrumbs__link:hover {
+  color: #1a1a1a;
+}
+
+.breadcrumbs__current {
+  color: #1a1a1a;
+}

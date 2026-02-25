@@ -25,10 +25,18 @@ router.delete('/deleteMe', userController.deleteMe);
 
 router.use(authController.restrictTo('admin')); //Daqui para baixo só admin é que consegue executar estes pedidos
 
+// ── Dashboard ──
+router.get('/admin/stats', userController.getAdminStats);
+
 router
   .route('/')
   .get(userController.getAllUsers)
   .post(userController.addNewUser);
+
+// ── Perfil completo de um user (user + orders + carrinho) ──
+router.get('/:id/profile', userController.getUserProfile);
+router.get('/:id/orders', userController.getUserOrders);
+
 router
   .route('/:id')
   .get(userController.getUser)

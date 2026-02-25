@@ -1,5 +1,8 @@
 const multer = require('multer');
 const User = require('./../Models/userModel');
+const Order = require('../Models/orderModel');
+const Cart = require('../Models/cartModel');
+const Product = require('../Models/productModels');
 const AppError = require('./../utils/appError');
 const catchAsync = require('./../utils/catchAsync');
 const factory = require('./handlerFactory');
@@ -95,3 +98,148 @@ exports.getAllUsers = factory.getAll(User);
 exports.updateUser = factory.updateOne(User);
 exports.getUser = factory.getOne(User);
 exports.deleteUser = factory.deleteOne(User);
+
+// ═══════════════════════════════════════
+//  ADMIN — Perfil completo de um user
+// ═══════════════════════════════════════
+
+// ───────── GET /users/:id/profile — User + orders + carrinho (admin) ─────────
+exports.getUserProfile = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new AppError('Utilizador não encontrado', 404));
+  }
+
+  // Buscar orders deste user
+  const orders = await Order.find({ user: req.params.id }).sort('-createdAt');
+
+  // Buscar carrinho deste user
+  const cart = await Cart.findOne({ user: req.params.id });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: {
+        user,
+        orders,
+        cart: cart || { items: [], totalPrice: 0, totalItems: 0 },
+      },
+    },
+  });
+});
+
+// ───────── GET /users/:id/orders — Orders de um user específico (admin) ─────────
+exports.getUserOrders = catchAsync(async (req, res, next) => {
+  const user = await User.findById(req.params.id);
+
+  if (!user) {
+    return next(new AppError('Utilizador não encontrado', 404));
+  }
+
+  const orders = await Order.find({ user: req.params.id }).sort('-createdAt');
+
+  res.status(200).json({
+    status: 'success',
+    results: orders.length,
+    data: {
+      data: orders,
+    },
+  });
+});
+
+// ═══════════════════════════════════════
+//  ADMIN — Dashboard Stats
+// ═══════════════════════════════════════
+
+// ───────── GET /users/admin/stats — Estatísticas gerais (admin) ─────────
+exports.getAdminStats = catchAsync(async (req, res, next) => {
+  // Contagens rápidas em paralelo
+  const [
+    totalUsers,
+    totalOrders,
+    totalProducts,
+    activeProducts,
+    orderStats,
+    usersByRole,
+    recentOrders,
+    lowStockProducts,
+  ] = await Promise.all([
+    User.countDocuments(),
+    Order.countDocuments(),
+    Product.countDocuments(),
+    Product.countDocuments({ active: true }),
+
+    // Revenue & orders por status
+    Order.aggregate([
+      {
+        $group: {
+          _id: '$status',
+          count: { $sum: 1 },
+          revenue: { $sum: '$totalPrice' },
+        },
+      },
+    ]),
+
+    // Users por role
+    User.aggregate([
+      {
+        $group: {
+          _id: '$role',
+          count: { $sum: 1 },
+        },
+      },
+    ]),
+
+    // 10 encomendas mais recentes
+    Order.find()
+      .sort('-createdAt')
+      .limit(10)
+      .populate({ path: 'user', select: 'name email' }),
+
+    // Produtos com stock baixo
+    Product.find({
+      $expr: { $lte: ['$stock', '$lowStockThreshold'] },
+      active: true,
+    })
+      .select('name sku stock lowStockThreshold imageCover')
+      .sort('stock'),
+  ]);
+
+  // Calcular totais de revenue
+  const totalRevenue = orderStats.reduce((sum, s) => {
+    if (['paid', 'processing', 'shipped', 'delivered'].includes(s._id)) {
+      return sum + s.revenue;
+    }
+    return sum;
+  }, 0);
+
+  const ordersByStatus = {};
+  orderStats.forEach((s) => {
+    ordersByStatus[s._id] = { count: s.count, revenue: s.revenue };
+  });
+
+  const usersBreakdown = {};
+  usersByRole.forEach((r) => {
+    usersBreakdown[r._id] = r.count;
+  });
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: {
+        overview: {
+          totalUsers,
+          totalOrders,
+          totalProducts,
+          activeProducts,
+          totalRevenue: Math.round(totalRevenue * 100) / 100,
+        },
+        usersByRole: usersBreakdown,
+        ordersByStatus,
+        recentOrders,
+        lowStockProducts,
+      },
+    },
+  });
+});

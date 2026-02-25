@@ -13,8 +13,9 @@ const AppError = require('./utils/appError');
 const globalErrorHandler = require('./controllers/errorController');
 const productRouter = require('./routes/productRoutes');
 const userRouter = require('./routes/usersRoutes');
-const bookingRouter = require('./routes/bookingRoutes');
 const reviewRouter = require('./routes/reviewRoutes');
+const cartRouter = require('./routes/cartRoutes');
+const orderRouter = require('./routes/orderRoutes');
 const compression = require('compression');
 
 
@@ -90,7 +91,17 @@ const limiter = rateLimit({
 app.use('/api', limiter);
 
 // Body parser, reading data from body into req.body
-app.use(express.json({ limit: '10kb' }));
+// Stripe webhook precisa do raw body — excluir dessas rotas
+app.use((req, res, next) => {
+  if (
+    req.originalUrl === '/api/v1/orders/webhook-checkout' ||
+    req.originalUrl === '/api/orders/webhook-checkout'
+  ) {
+    next();
+  } else {
+    express.json({ limit: '10kb' })(req, res, next);
+  }
+});
 app.use(cookieParser());
 
 // Data sanitization against noSQL query injection
@@ -103,11 +114,12 @@ app.use(xss());
 app.use(
   hpp({
     whitelist: [
-      'duration',
       'ratingsAverage',
       'ratingsQuantity',
-      'maxGroupSize',
       'price',
+      'category',
+      'material',
+      'stock',
     ],
   }),
 );
@@ -119,16 +131,18 @@ app.use((req, res, next) => {
 });
 
 // 3) Routes
-app.use('/api/v1/bookings', bookingRouter);
 app.use('/api/v1/products', productRouter);
 app.use('/api/v1/users', userRouter);
 app.use('/api/v1/reviews', reviewRouter);
+app.use('/api/v1/cart', cartRouter);
+app.use('/api/v1/orders', orderRouter);
 
 // Backward compatibility
-app.use('/api/bookings', bookingRouter);
 app.use('/api/products', productRouter);
 app.use('/api/users', userRouter);
 app.use('/api/reviews', reviewRouter);
+app.use('/api/cart', cartRouter);
+app.use('/api/orders', orderRouter);
 
 
 

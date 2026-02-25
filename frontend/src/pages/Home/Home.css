@@ -1,0 +1,104 @@
+.home__loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 60vh;
+  font-size: 14px;
+  letter-spacing: 2px;
+  color: #999;
+}
+
+/* ─── Hero ─── */
+.home__hero {
+  position: relative;
+  height: 70vh;
+  min-height: 400px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(135deg, #f5f0e8 0%, #e8dfd3 100%);
+  overflow: hidden;
+}
+
+.home__hero-content {
+  text-align: center;
+  z-index: 1;
+}
+
+.home__hero-title {
+  font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+  font-size: 72px;
+  font-weight: 300;
+  letter-spacing: 20px;
+  color: #1a1a1a;
+  margin: 0;
+}
+
+.home__hero-subtitle {
+  font-size: 14px;
+  letter-spacing: 8px;
+  text-transform: uppercase;
+  color: #666;
+  margin-top: 12px;
+}
+
+.home__hero-desc {
+  font-size: 14px;
+  color: #888;
+  margin-top: 24px;
+  max-width: 400px;
+  line-height: 1.8;
+}
+
+/* ─── Category sections ─── */
+.home__category {
+  padding: 60px 0 40px;
+}
+
+.home__category-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  padding: 0 40px;
+  margin-bottom: 32px;
+}
+
+.home__category-title {
+  font-size: 18px;
+  letter-spacing: 4px;
+  font-weight: 400;
+  color: #1a1a1a;
+}
+
+.home__category-link {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #666;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.home__category-link:hover {
+  color: #1a1a1a;
+}
+
+@media (max-width: 768px) {
+  .home__hero {
+    height: 50vh;
+    min-height: 300px;
+  }
+
+  .home__hero-title {
+    font-size: 42px;
+    letter-spacing: 10px;
+  }
+
+  .home__category-header {
+    padding: 0 16px;
+  }
+
+  .home__category-title {
+    font-size: 15px;
+    letter-spacing: 3px;
+  }
+}

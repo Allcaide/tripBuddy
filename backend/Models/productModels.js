@@ -20,6 +20,14 @@ const productSchema = new mongoose.Schema(
       trim: true,
     },
 
+    // ───────── Marca / Fornecedor ─────────
+    // MilFios funciona como intermediário — este campo identifica o fornecedor ou marca original.
+    brand: {
+      type: String,
+      trim: true,
+      // ex: "Zara Home", "H&M Home", "Fornecedor XYZ"
+    },
+
     // ───────── Categorização ─────────
     // Sem enum — o admin pode criar categorias novas livremente.
     // O frontend popula o dropdown com os valores distintos já existentes na DB.
@@ -173,6 +181,7 @@ productSchema.index({ slug: 1 });
 productSchema.index({ category: 1 });
 productSchema.index({ sku: 1 });
 productSchema.index({ active: 1, featured: -1 });
+productSchema.index({ brand: 1 });
 
 // ───────── Virtuals ─────────
 // Indica se o produto tem stock baixo
@@ -209,7 +218,7 @@ productSchema.pre(/^find/, function (next) {
 // Retorna os valores distintos de campos dinâmicos para popular dropdowns no frontend.
 // Uso: const options = await Product.getDistinctFieldValues();
 productSchema.statics.getDistinctFieldValues = async function () {
-  const [categories, subcategories, colors, sizes, dimensions, materials, tags] =
+  const [categories, subcategories, colors, sizes, dimensions, materials, tags, brands] =
     await Promise.all([
       this.distinct('category'),
       this.distinct('subcategory'),
@@ -218,6 +227,7 @@ productSchema.statics.getDistinctFieldValues = async function () {
       this.distinct('dimensions'),
       this.distinct('material'),
       this.distinct('tags'),
+      this.distinct('brand'),
     ]);
 
   return {
@@ -228,6 +238,7 @@ productSchema.statics.getDistinctFieldValues = async function () {
     dimensions: dimensions.filter(Boolean).sort(),
     materials: materials.filter(Boolean).sort(),
     tags: tags.filter(Boolean).sort(),
+    brands: brands.filter(Boolean).sort(),
   };
 };
 

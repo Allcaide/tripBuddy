@@ -1,0 +1,80 @@
+.view-controls {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  padding: 0 40px 20px;
+  gap: 20px;
+}
+
+.view-controls__slider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.view-controls__label {
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #666;
+}
+
+.view-controls__track {
+  display: flex;
+  align-items: center;
+  gap: 0;
+  background: #ddd;
+  border-radius: 10px;
+  height: 3px;
+  width: 50px;
+  position: relative;
+}
+
+.view-controls__dot {
+  width: 14px;
+  height: 14px;
+  border-radius: 50%;
+  border: 2px solid #999;
+  background: #fff;
+  cursor: pointer;
+  position: relative;
+  z-index: 1;
+  transition: all 0.2s;
+}
+
+.view-controls__dot--active {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+}
+
+.view-controls__right {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.view-controls__btn,
+.view-controls__sort {
+  background: none;
+  border: none;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #666;
+  cursor: pointer;
+  font-family: inherit;
+}
+
+.view-controls__sort {
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.view-controls__sep {
+  color: #ddd;
+  font-size: 14px;
+}
+
+@media (max-width: 768px) {
+  .view-controls {
+    padding: 0 16px 16px;
+  }
+}

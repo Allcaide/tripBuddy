@@ -28,36 +28,45 @@ exports.uploadProductImages = upload.fields([
   },
   {
     name: 'images',
-    maxCount: 3,
+    maxCount: 10,
   },
 ]);
 
 exports.resizeProductImages = catchAsync(async (req, res, next) => {
-  if (!req.files || !req.files.imageCover || !req.files.images) return next();
+  if (!req.files) return next();
 
-  //1) Cover Image
-  req.body.imageCover = `product-${req.params.id}-${Date.now()}-cover.jpeg`;
-  await sharp(req.files.imageCover[0].buffer)
-    .resize(2000, 1333)
-    .toFormat('jpeg')
-    .jpeg({ quality: 90 })
-    .toFile(`public/img/products/${req.body.imageCover}`);
+  // Determinar prefixo do nome: usar SKU se disponível, senão product-{id}
+  const sku = req.body.sku || req.params.id || Date.now();
+  const prefix = sku;
 
-  //2) Images
-  req.body.images = [];
-  await Promise.all(
-    req.files.images.map(async (file, i) => {
-      const filename = `product-${req.params.id}-${Date.now()}-${i + 1}.jpeg`;
+  // 1) Cover Image
+  if (req.files.imageCover) {
+    req.body.imageCover = `${prefix}-p1.jpeg`;
+    await sharp(req.files.imageCover[0].buffer)
+      .resize(2000, 1333)
+      .toFormat('jpeg')
+      .jpeg({ quality: 90 })
+      .toFile(`public/img/products/${req.body.imageCover}`);
+  }
 
-      await sharp(file.buffer)
-        .resize(2000, 1333)
-        .toFormat('jpeg')
-        .jpeg({ quality: 90 })
-        .toFile(`public/img/products/${filename}`);
+  // 2) Additional Images
+  if (req.files.images) {
+    req.body.images = [];
+    await Promise.all(
+      req.files.images.map(async (file, i) => {
+        // a1, a2, a3... (imagens adicionais)
+        const filename = `${prefix}-a${i + 1}.jpeg`;
 
-      req.body.images.push(filename);
-    })
-  );
+        await sharp(file.buffer)
+          .resize(2000, 1333)
+          .toFormat('jpeg')
+          .jpeg({ quality: 90 })
+          .toFile(`public/img/products/${filename}`);
+
+        req.body.images.push(filename);
+      }),
+    );
+  }
 
   next();
 });
@@ -69,6 +78,23 @@ exports.getAllProducts = factory.getAll(Product, 'reviews');
 exports.addNewProduct = factory.createOne(Product);
 
 exports.getProduct = factory.getOne(Product, { path: 'reviews' });
+
+exports.getProductBySlug = catchAsync(async (req, res, next) => {
+  const product = await Product.findOne({ slug: req.params.slug }).populate({
+    path: 'reviews',
+  });
+
+  if (!product) {
+    return next(new AppError('Nenhum produto encontrado com esse slug', 404));
+  }
+
+  res.status(200).json({
+    status: 'success',
+    data: {
+      data: product,
+    },
+  });
+});
 exports.updateProduct = factory.updateOne(Product);
 exports.deleteProduct = factory.deleteOne(Product);
 

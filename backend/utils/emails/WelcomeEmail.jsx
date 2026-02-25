@@ -39,17 +39,17 @@ const WelcomeEmail = ({ firstName, url }) => {
           React.createElement(
             Text,
             { style: paragraphStyle },
-            "We're excited to have you on board! You're now part of a community of travelers exploring the world's most amazing destinations.",
+            "We're excited to have you on board! You're now part of the MilFios family.",
           ),
           React.createElement(
             Text,
             { style: paragraphStyle },
-            'Start your journey by browsing our the available tours:',
+            'Comece por explorar os nossos produtos:',
           ),
           React.createElement(
             Button,
             { href: url, style: buttonStyle },
-            'Explore Tours',
+            'Ver Produtos',
           ),
           React.createElement(Hr, { style: hrStyle }),
           React.createElement(
@@ -60,7 +60,7 @@ const WelcomeEmail = ({ firstName, url }) => {
           React.createElement(
             Text,
             { style: footerStyle },
-            'Happy traveling! ✈️',
+            'Boas compras! 🧵',
             React.createElement('br', null),
             'A equipa MilFios',
           ),

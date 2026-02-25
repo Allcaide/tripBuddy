@@ -14,7 +14,7 @@ router.use('/:productId/reviews', reviewRouter);
 router.get('/field-options', productController.getFieldOptions);
 
 // Buscar produto por slug (para páginas de detalhe com URL amigável)
-router.get('/slug/:slug', productController.getProduct);
+router.get('/slug/:slug', productController.getProductBySlug);
 
 // Listar todos / ver um produto — público
 router

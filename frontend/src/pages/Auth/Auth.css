@@ -1,0 +1,285 @@
+/* ═══════════════════════════════════════
+   Auth Pages — Zara Home style
+   ═══════════════════════════════════════ */
+
+.auth {
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: flex-start;
+  padding: 40px 16px 80px;
+  background: #fff;
+}
+
+.auth__panel {
+  width: 100%;
+  max-width: 520px;
+  position: relative;
+}
+
+/* ─── Top bar: back + close ─── */
+.auth__topbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 40px;
+}
+
+.auth__back,
+.auth__close {
+  font-size: 28px;
+  color: #1a1a1a;
+  text-decoration: none;
+  line-height: 1;
+  padding: 4px;
+  transition: opacity 0.2s;
+}
+
+.auth__back:hover,
+.auth__close:hover {
+  opacity: 0.5;
+}
+
+/* ─── Title ─── */
+.auth__title {
+  text-align: center;
+  font-size: 16px;
+  font-weight: 500;
+  letter-spacing: 3px;
+  color: #1a1a1a;
+  margin-bottom: 40px;
+}
+
+/* ─── Form ─── */
+.auth__form {
+  display: flex;
+  flex-direction: column;
+  gap: 28px;
+}
+
+/* ─── Fields ─── */
+.auth__field {
+  display: flex;
+  flex-direction: column;
+}
+
+.auth__label {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #999;
+  margin-bottom: 6px;
+}
+
+.auth__input-wrap {
+  position: relative;
+  display: flex;
+  align-items: center;
+}
+
+.auth__input {
+  width: 100%;
+  border: none;
+  border-bottom: 1.5px solid #ccc;
+  padding: 10px 36px 10px 0;
+  font-size: 14px;
+  font-family: inherit;
+  color: #1a1a1a;
+  background: transparent;
+  outline: none;
+  transition: border-color 0.2s;
+}
+
+.auth__input:focus {
+  border-bottom-color: #1a1a1a;
+}
+
+.auth__toggle-pw {
+  position: absolute;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: #999;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+
+.auth__toggle-pw:hover {
+  color: #1a1a1a;
+}
+
+.auth__field-error {
+  font-size: 11px;
+  color: #c0392b;
+  margin-top: 6px;
+}
+
+/* ─── Password rules grid (like Zara) ─── */
+.auth__rules {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px 24px;
+}
+
+.auth__rule {
+  font-size: 11px;
+  color: #c0392b;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  transition: color 0.2s;
+}
+
+.auth__rule--pass {
+  color: #27ae60;
+}
+
+.auth__rule-icon {
+  font-size: 13px;
+  font-weight: 700;
+  width: 16px;
+  text-align: center;
+  flex-shrink: 0;
+}
+
+/* ─── Checkboxes ─── */
+.auth__checkboxes {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.auth__checkbox {
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  cursor: pointer;
+  font-size: 12px;
+  line-height: 1.6;
+  color: #555;
+}
+
+.auth__checkbox input[type='checkbox'] {
+  flex-shrink: 0;
+  width: 18px;
+  height: 18px;
+  margin-top: 2px;
+  accent-color: #1a1a1a;
+  cursor: pointer;
+}
+
+.auth__inline-link {
+  color: #1a1a1a;
+  text-decoration: underline;
+}
+
+/* ─── Error ─── */
+.auth__error {
+  font-size: 12px;
+  color: #c0392b;
+  text-align: center;
+  padding: 10px;
+  background: #fdf2f2;
+  border-radius: 4px;
+}
+
+/* ─── Submit ─── */
+.auth__submit {
+  width: 100%;
+  padding: 16px;
+  background: #1a1a1a;
+  color: #fff;
+  border: 1px solid #1a1a1a;
+  font-size: 12px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: all 0.2s;
+  font-family: inherit;
+}
+
+.auth__submit:hover:not(:disabled) {
+  background: #333;
+}
+
+.auth__submit:disabled {
+  background: #e5e5e5;
+  border-color: #e5e5e5;
+  color: #999;
+  cursor: not-allowed;
+}
+
+/* ─── Link ─── */
+.auth__link {
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #999;
+  text-decoration: underline;
+  margin-top: -8px;
+}
+
+.auth__link:hover {
+  color: #1a1a1a;
+}
+
+/* ─── Divider ─── */
+.auth__divider {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin: 32px 0;
+}
+
+.auth__divider::before,
+.auth__divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: #ddd;
+}
+
+.auth__divider span {
+  font-size: 11px;
+  color: #999;
+  letter-spacing: 1px;
+  text-transform: lowercase;
+}
+
+/* ─── Alt button (outline) ─── */
+.auth__alt-btn {
+  display: block;
+  width: 100%;
+  padding: 16px;
+  text-align: center;
+  background: #fff;
+  color: #1a1a1a;
+  border: 1px solid #1a1a1a;
+  font-size: 12px;
+  letter-spacing: 2px;
+  text-decoration: none;
+  transition: all 0.2s;
+}
+
+.auth__alt-btn:hover {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 600px) {
+  .auth {
+    padding: 20px 16px 60px;
+  }
+
+  .auth__rules {
+    grid-template-columns: 1fr;
+  }
+
+  .auth__title {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+}

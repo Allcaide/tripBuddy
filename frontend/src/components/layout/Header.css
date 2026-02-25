@@ -1,0 +1,93 @@
+.header {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  border-bottom: 1px solid #e5e5e5;
+}
+
+.header__top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 40px;
+}
+
+/* ─── Hamburger ─── */
+.header__menu-btn {
+  background: none;
+  border: none;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+  padding: 4px;
+}
+
+.header__menu-btn span {
+  display: block;
+  width: 22px;
+  height: 1.5px;
+  background: #1a1a1a;
+}
+
+/* ─── Logo ─── */
+.header__logo {
+  font-family: 'Cormorant Garamond', 'Times New Roman', serif;
+  font-size: 28px;
+  font-weight: 600;
+  letter-spacing: 8px;
+  color: #1a1a1a;
+  text-decoration: none;
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+}
+
+/* ─── Actions ─── */
+.header__actions {
+  display: flex;
+  align-items: center;
+  gap: 24px;
+}
+
+.header__action-btn {
+  background: none;
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #1a1a1a;
+  cursor: pointer;
+  text-decoration: none;
+  text-transform: uppercase;
+}
+
+.header__action-btn:hover {
+  opacity: 0.6;
+}
+
+.header__user-name {
+  font-weight: 500;
+  border-bottom: 1px solid #1a1a1a;
+  padding-bottom: 1px;
+}
+
+@media (max-width: 768px) {
+  .header__top {
+    padding: 14px 16px;
+  }
+
+  .header__logo {
+    font-size: 22px;
+    letter-spacing: 5px;
+  }
+
+  .header__actions {
+    gap: 12px;
+  }
+
+  .header__action-btn {
+    font-size: 10px;
+  }
+}
