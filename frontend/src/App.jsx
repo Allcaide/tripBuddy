@@ -8,6 +8,9 @@ import ProductDetail from './pages/ProductDetail/ProductDetail';
 import Login from './pages/Auth/Login';
 import Signup from './pages/Auth/Signup';
 import ForgotPassword from './pages/Auth/ForgotPassword';
+import Account from './pages/Account/Account';
+import Admin from './pages/Admin/Admin';
+import ProtectedRoute from './components/auth/ProtectedRoute';
 
 function App() {
   return (
@@ -22,6 +25,22 @@ function App() {
           <Route path="/login" element={<Login />} />
           <Route path="/signup" element={<Signup />} />
           <Route path="/forgot-password" element={<ForgotPassword />} />
+          <Route
+            path="/account"
+            element={
+              <ProtectedRoute>
+                <Account />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute roles={['admin']}>
+                <Admin />
+              </ProtectedRoute>
+            }
+          />
         </Routes>
       </main>
       <Footer />

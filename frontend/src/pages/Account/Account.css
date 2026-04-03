@@ -1,0 +1,201 @@
+/* ═══════════════════════════════════════
+   Account Page — Zara Home style
+   ═══════════════════════════════════════ */
+
+.account {
+  max-width: 860px;
+  margin: 0 auto;
+  padding: 48px 40px 80px;
+}
+
+/* ─── Cabeçalho ─── */
+.account__header {
+  border-bottom: 1px solid #e5e5e5;
+  padding-bottom: 24px;
+  margin-bottom: 0;
+}
+
+.account__title {
+  font-size: 14px;
+  font-weight: 400;
+  letter-spacing: 4px;
+  color: #1a1a1a;
+  margin: 0 0 6px;
+}
+
+.account__welcome {
+  font-size: 13px;
+  color: #888;
+  letter-spacing: 0.5px;
+  margin: 0;
+}
+
+/* ─── Tabs ─── */
+.account__tabs {
+  display: flex;
+  border-bottom: 1px solid #e5e5e5;
+  margin-bottom: 40px;
+}
+
+.account__tab {
+  padding: 16px 0;
+  margin-right: 40px;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 1.5px;
+  color: #999;
+  cursor: pointer;
+  transition: all 0.2s;
+  position: relative;
+  top: 1px; /* alinha com o border-bottom do container */
+}
+
+.account__tab:hover {
+  color: #1a1a1a;
+}
+
+.account__tab--active {
+  color: #1a1a1a;
+  border-bottom-color: #1a1a1a;
+}
+
+/* ─── Conteúdo ─── */
+.account__section {
+  min-height: 240px;
+}
+
+.account__section-title {
+  font-size: 11px;
+  font-weight: 400;
+  letter-spacing: 2px;
+  color: #1a1a1a;
+  margin: 0 0 28px;
+}
+
+/* ─── Campos de perfil ─── */
+.account__field-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 24px;
+  margin-bottom: 24px;
+}
+
+.account__field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.account__field-label {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: #999;
+  text-transform: uppercase;
+}
+
+.account__field-value {
+  font-size: 14px;
+  color: #1a1a1a;
+  letter-spacing: 0.3px;
+}
+
+.account__role-badge {
+  display: inline-block;
+  font-size: 10px;
+  letter-spacing: 1.5px;
+  background: #f5f5f0;
+  padding: 4px 10px;
+  border: 1px solid #e5e5e5;
+  width: fit-content;
+}
+
+/* ─── Botão editar ─── */
+.account__edit-btn {
+  margin-top: 12px;
+  padding: 14px 32px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 2px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.account__edit-btn:hover:not(:disabled) {
+  background: #333;
+}
+
+.account__edit-btn:disabled {
+  background: #e5e5e5;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+/* ─── Estado vazio ─── */
+.account__empty {
+  text-align: center;
+  padding: 60px 0;
+  color: #999;
+}
+
+.account__empty p {
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  margin: 0 0 8px;
+}
+
+.account__empty-sub {
+  font-size: 12px;
+  color: #bbb !important;
+}
+
+/* ─── Footer / Logout ─── */
+.account__footer {
+  margin-top: 60px;
+  padding-top: 24px;
+  border-top: 1px solid #e5e5e5;
+}
+
+.account__logout-btn {
+  background: none;
+  border: 1px solid #1a1a1a;
+  padding: 12px 28px;
+  font-family: inherit;
+  font-size: 11px;
+  letter-spacing: 2px;
+  color: #1a1a1a;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.account__logout-btn:hover {
+  background: #1a1a1a;
+  color: #fff;
+}
+
+/* ─── Responsive ─── */
+@media (max-width: 640px) {
+  .account {
+    padding: 32px 16px 60px;
+  }
+
+  .account__tabs {
+    overflow-x: auto;
+    gap: 0;
+  }
+
+  .account__tab {
+    white-space: nowrap;
+    flex-shrink: 0;
+    margin-right: 24px;
+  }
+
+  .account__field-row {
+    grid-template-columns: 1fr;
+  }
+}

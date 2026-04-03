@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
-import { fetchAllProducts, groupByCategoryAndSub } from '../../api/products';
+import { fetchAllProducts, groupByCategoryAndSub, groupProductVariants } from '../../api/products';
 import ProductGrid from '../../components/product/ProductGrid';
 import './Home.css';
 
@@ -46,7 +46,8 @@ export default function Home() {
       {categories.map((category) => {
         const subcategories = grouped[category];
         const allProducts = Object.values(subcategories).flat();
-        const preview = allProducts.slice(0, 3);
+        // Agrupar variantes e mostrar até 4 grupos na home
+        const preview = groupProductVariants(allProducts).slice(0, 4);
         const catSlug = slugify(category);
 
         return (
@@ -58,7 +59,7 @@ export default function Home() {
               </Link>
             </div>
 
-            <ProductGrid products={preview} view="grid" />
+            <ProductGrid groups={preview} view="grid" />
           </section>
         );
       })}

@@ -18,9 +18,12 @@ module.exports = class Email {
       return nodemailer.createTransport({
         service: 'SendGrid',
         auth: {
-          user: process.env.SENDGRID_USERNAME,//On config.env
+          user: process.env.SENDGRID_USERNAME,
           pass: process.env.SENDGRID_PASSWORD,
         },
+        connectionTimeout: 5000,
+        greetingTimeout: 5000,
+        socketTimeout: 5000,
       });
     }
 
@@ -32,6 +35,9 @@ module.exports = class Email {
         user: process.env.EMAIL_USERNAME,
         pass: process.env.EMAIL_PASSWORD,
       },
+      connectionTimeout: 5000,
+      greetingTimeout: 5000,
+      socketTimeout: 5000,
     });
   }
 

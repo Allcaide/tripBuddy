@@ -2,14 +2,29 @@ import { Link, useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import './Header.css';
 
-export default function Header() {
-  const { isAuthenticated, user, logout } = useAuth();
-  const navigate = useNavigate();
+function UserAvatarIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.5"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      width="20"
+      height="20"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="8" r="4" />
+      <path d="M4 20c0-4 3.6-7 8-7s8 3 8 7" />
+    </svg>
+  );
+}
 
-  const handleLogout = async () => {
-    await logout();
-    navigate('/');
-  };
+export default function Header() {
+  const { isAuthenticated, user } = useAuth();
+
+  const accountPath = user?.role === 'admin' ? '/admin' : '/account';
 
   return (
     <header className="header">
@@ -29,14 +44,17 @@ export default function Header() {
           <button className="header__action-btn">SEARCH</button>
 
           {isAuthenticated ? (
-            <>
-              <Link to="/account" className="header__action-btn header__user-name">
-                {user.name.split(' ')[0].toUpperCase()}
-              </Link>
-              <button className="header__action-btn" onClick={handleLogout}>
-                LOG OUT
-              </button>
-            </>
+            <Link
+              to={accountPath}
+              className="header__action-btn header__avatar-btn"
+              title={user?.role === 'admin' ? 'Painel Admin' : 'A minha conta'}
+              aria-label="A minha conta"
+            >
+              <UserAvatarIcon />
+              {user?.role === 'admin' && (
+                <span className="header__admin-dot" aria-hidden="true" />
+              )}
+            </Link>
           ) : (
             <Link to="/login" className="header__action-btn">LOG IN</Link>
           )}

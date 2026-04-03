@@ -1,6 +1,6 @@
 import { useState, useEffect, useMemo } from 'react';
 import { useParams } from 'react-router-dom';
-import { fetchAllProducts, groupByCategoryAndSub } from '../../api/products';
+import { fetchAllProducts, groupByCategoryAndSub, groupProductVariants } from '../../api/products';
 import Breadcrumbs from '../../components/ui/Breadcrumbs';
 import SubcategoryTabs from '../../components/ui/SubcategoryTabs';
 import ViewControls from '../../components/ui/ViewControls';
@@ -87,7 +87,7 @@ export default function CategoryPage() {
     return matchedSub ? subcategories[matchedSub] : [];
   }, [matchedCategory, subcategorySlug, subcategories, subcategoryNames]);
 
-  // Sort
+  // Sort flat products, depois agrupar em variantes
   const sortedProducts = useMemo(() => {
     if (!sort) return filteredProducts;
     const sorted = [...filteredProducts];
@@ -100,6 +100,12 @@ export default function CategoryPage() {
     });
     return sorted;
   }, [filteredProducts, sort]);
+
+  // Agrupar variantes (ex: "Capa Linho — King", "Capa Linho — Casal" → 1 card)
+  const groupedProducts = useMemo(
+    () => groupProductVariants(sortedProducts),
+    [sortedProducts],
+  );
 
   // Breadcrumbs
   const breadcrumbItems = useMemo(() => {
@@ -147,7 +153,7 @@ export default function CategoryPage() {
         onSortChange={setSort}
       />
 
-      <ProductGrid products={sortedProducts} view={view} />
+      <ProductGrid groups={groupedProducts} view={view} />
     </div>
   );
 }

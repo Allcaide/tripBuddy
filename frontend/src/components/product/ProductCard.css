@@ -25,8 +25,20 @@
   transform: scale(1.03);
 }
 
+/* Badge SALE */
+.product-card__badge {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  background: #1a1a1a;
+  color: #fff;
+  font-size: 9px;
+  letter-spacing: 2px;
+  padding: 4px 8px;
+}
+
 .product-card__info {
-  padding: 16px 8px 0;
+  padding: 14px 8px 0;
 }
 
 .product-card__name {
@@ -43,16 +55,8 @@
   text-decoration: underline;
 }
 
-.product-card__brand {
-  display: block;
-  font-size: 10px;
-  letter-spacing: 0.5px;
-  color: #999;
-  margin-top: 2px;
-}
-
 .product-card__price {
-  margin-top: 8px;
+  margin-top: 6px;
   font-size: 13px;
   color: #1a1a1a;
   letter-spacing: 0.5px;
@@ -66,6 +70,82 @@
 
 .product-card__price--sale {
   color: #c0392b;
+}
+
+/* Cores: swatches + contador */
+.product-card__colors {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  margin-top: 10px;
+  flex-wrap: wrap;
+}
+
+.product-card__color-dot {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  cursor: pointer;
+  padding: 0;
+  transition: transform 0.15s, box-shadow 0.15s;
+  flex-shrink: 0;
+}
+
+.product-card__color-dot:hover {
+  transform: scale(1.2);
+}
+
+.product-card__color-dot--active {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #1a1a1a;
+}
+
+.product-card__color-count {
+  font-size: 10px;
+  color: #999;
+  letter-spacing: 0.5px;
+}
+
+/* Botões de tamanho/variante */
+.product-card__sizes {
+  display: flex;
+  justify-content: flex-start;
+  gap: 4px;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  margin-top: 10px;
+  padding-bottom: 2px;
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none;
+}
+
+.product-card__sizes::-webkit-scrollbar {
+  display: none; /* Chrome/Safari */
+}
+
+.product-card__size-btn {
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  background: #fff;
+  font-family: inherit;
+  font-size: 9px;
+  letter-spacing: 0.5px;
+  color: #555;
+  cursor: pointer;
+  transition: all 0.15s;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.product-card__size-btn:hover {
+  border-color: #1a1a1a;
+  color: #1a1a1a;
+}
+
+.product-card__size-btn--active {
+  background: #1a1a1a;
+  border-color: #1a1a1a;
+  color: #fff;
 }
 
 /* ── Large view ── */

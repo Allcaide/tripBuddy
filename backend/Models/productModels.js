@@ -28,6 +28,16 @@ const productSchema = new mongoose.Schema(
       // ex: "Zara Home", "H&M Home", "Fornecedor XYZ"
     },
 
+    // ───────── Grupo de produto ─────────
+    // Agrupa variantes que partilham o mesmo produto base mas diferem em cor/tamanho/material.
+    // Produtos com o mesmo productGroup são exibidos juntos num único card no frontend.
+    // ex: 'capa-de-edredao-em-linho' → junta linho natural + verde + outras cores futuras
+    productGroup: {
+      type: String,
+      trim: true,
+      index: true,
+    },
+
     // ───────── Categorização ─────────
     // Sem enum — o admin pode criar categorias novas livremente.
     // O frontend popula o dropdown com os valores distintos já existentes na DB.

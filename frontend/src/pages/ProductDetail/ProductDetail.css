@@ -120,6 +120,64 @@
   margin-bottom: 10px;
 }
 
+/* Label + valor seleccionado na mesma linha */
+.pdp__label-row {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  margin-bottom: 10px;
+}
+
+.pdp__label-row .pdp__label {
+  margin-bottom: 0;
+}
+
+.pdp__selected-value {
+  font-size: 11px;
+  letter-spacing: 0.5px;
+  color: #1a1a1a;
+  text-transform: capitalize;
+}
+
+/* Erro de validação */
+.pdp__section--error .pdp__color-swatches,
+.pdp__section--error .pdp__sizes {
+  outline: 1px solid #c0392b;
+  outline-offset: 6px;
+}
+
+.pdp__field-error {
+  font-size: 11px;
+  color: #c0392b;
+  margin: 6px 0 0;
+  letter-spacing: 0.3px;
+}
+
+/* ─── Seletor de cor ─── */
+.pdp__color-swatches {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.pdp__color-btn {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  cursor: pointer;
+  transition: transform 0.15s, box-shadow 0.15s;
+  position: relative;
+}
+
+.pdp__color-btn:hover {
+  transform: scale(1.15);
+}
+
+.pdp__color-btn--active {
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3.5px #1a1a1a;
+}
+
+/* Sizes: chips clássicos (para uso futuro em produtos de vestuário) */
 .pdp__sizes {
   display: flex;
   gap: 10px;
@@ -134,16 +192,84 @@
   letter-spacing: 1px;
   cursor: pointer;
   transition: all 0.2s;
+  font-family: inherit;
 }
 
-.pdp__size-btn:hover {
-  border-color: #1a1a1a;
+.pdp__size-btn:hover { border-color: #1a1a1a; }
+.pdp__size-btn--active { background: #1a1a1a; color: #fff; border-color: #1a1a1a; }
+
+/* ── Lista estilo Zara (tamanhos de roupa de cama com preço por linha) ── */
+.pdp__size-list {
+  border-top: 1px solid #e8e8e4;
+  margin-top: 4px;
 }
 
-.pdp__size-btn--active {
+.pdp__size-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  padding: 13px 4px 13px 14px;
+  border: none;
+  border-bottom: 1px solid #e8e8e4;
+  background: none;
+  cursor: pointer;
+  font-family: inherit;
+  transition: background 0.15s;
+  text-align: left;
+  position: relative;
+}
+
+.pdp__size-row::before {
+  content: '';
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  background: transparent;
+  transition: background 0.15s;
+}
+
+.pdp__size-row:hover {
+  background: #faf9f7;
+}
+
+.pdp__size-row:hover::before {
+  background: #ccc;
+}
+
+.pdp__size-row--active::before {
   background: #1a1a1a;
-  color: #fff;
-  border-color: #1a1a1a;
+}
+
+.pdp__size-row__label {
+  font-size: 13px;
+  color: #333;
+  letter-spacing: 0.2px;
+  line-height: 1.4;
+}
+
+.pdp__size-row--active .pdp__size-row__label {
+  color: #1a1a1a;
+  font-weight: 500;
+}
+
+.pdp__size-row__price {
+  font-size: 13px;
+  color: #1a1a1a;
+  letter-spacing: 0.3px;
+  flex-shrink: 0;
+  margin-left: 16px;
+}
+
+.pdp__size-row__price--old {
+  color: #bbb;
+  font-size: 11px;
+}
+
+.pdp__size-row__price--sale {
+  color: #c0392b;
 }
 
 .pdp__detail-text {
@@ -181,6 +307,19 @@
   color: #bbb;
   letter-spacing: 1px;
   margin: 0 0 28px;
+}
+
+/* Preço do variante activo quando há range */
+.pdp__variant-price {
+  font-size: 12px;
+  color: #888;
+  letter-spacing: 0.5px;
+  margin: -8px 0 20px;
+}
+
+.pdp__variant-price strong {
+  color: #1a1a1a;
+  font-weight: 500;
 }
 
 .pdp__description {
